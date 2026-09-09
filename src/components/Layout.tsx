@@ -190,28 +190,28 @@ export default function Layout() {
         </div>
       </main>
 
-      {/* 手机底部导航 */}
-      <nav className="md:hidden fixed bottom-2.5 inset-x-4 z-40 rounded-[22px]" style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.75) 50%, rgba(255,255,255,0.8) 100%)',
-        backdropFilter: 'blur(40px) saturate(200%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(200%)',
-        border: '1px solid rgba(255,255,255,0.85)',
-        boxShadow: '0 -8px 28px rgba(15,23,42,0.12), 0 -3px 8px rgba(15,23,42,0.06), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 1px rgba(255,255,255,0.5), inset 0 0 20px rgba(255,255,255,0.1)'
+      {/* 手机底部导航 - 一体式液态玻璃 */}
+      <nav className="md:hidden fixed bottom-2.5 inset-x-4 z-40 rounded-[22px] overflow-hidden" style={{
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.7) 100%)',
+        backdropFilter: 'blur(30px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(30px) saturate(200%)',
+        border: '1.5px solid rgba(255,255,255,0.7)',
+        boxShadow: '0 -6px 24px rgba(15,23,42,0.1), 0 -2px 6px rgba(15,23,42,0.05), 0 0 20px rgba(255,255,255,0.3), inset 0 1.5px 2px rgba(255,255,255,0.85), inset 0 -2px 4px rgba(15,23,42,0.06), inset 0 0 0 1px rgba(255,255,255,0.2)'
       }}>
-        <div className="grid grid-cols-5 h-[68px] px-2 pb-[env(safe-area-inset-bottom)] items-center gap-1.5">
+        <div className="grid grid-cols-5 h-[62px] px-1.5 pb-[env(safe-area-inset-bottom)] items-center">
           {MOBILE_BOTTOM.map((n) => {
             const active = n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)
             if (n.to === '/add') {
               return (
-                <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] text-white active:scale-100 touch-manipulation">
-                  <span className="fab-button w-full h-[52px] -mt-6 text-white grid place-items-center"><Plus size={22} strokeWidth={2.5} /></span>
-                  <span className="font-medium -mt-0.5 text-[#0071e3]">记一笔</span>
+                <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] active:scale-95 touch-manipulation">
+                  <span className="w-12 h-9 rounded-full bg-gradient-to-b from-[#4da3ff] to-[#0066cc] text-white grid place-items-center shadow-lg shadow-blue-500/30"><Plus size={18} strokeWidth={2.5} /></span>
+                  <span className="font-medium mt-0.5 text-[#0071e3]">记一笔</span>
                 </NavLink>
               )
             }
             return (
-              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] h-[48px] rounded-full transition-all duration-150 active:scale-95 touch-manipulation ${active ? 'fab-button text-white' : 'btn-glass text-slate-600'}`}>
-                <n.icon size={18} strokeWidth={2} />
+              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] h-[50px] rounded-full transition-all duration-150 active:scale-95 touch-manipulation ${active ? 'text-[#0071e3] bg-blue-500/10' : 'text-slate-500'}`}>
+                <n.icon size={19} strokeWidth={2} />
                 <span className={active ? 'font-semibold' : 'font-medium'}>{n.label}</span>
               </NavLink>
             )
