@@ -37,6 +37,7 @@ pnpm-debug.log*
 .parcel-cache/
 .eslintcache
 .stylelintcache
+*.tsbuildinfo
 
 # OS
 Thumbs.db
