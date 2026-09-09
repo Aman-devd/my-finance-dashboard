@@ -214,7 +214,7 @@ export default function Layout() {
             if (n.to === '/add') {
               return (
                 <NavLink key={n.to} to="/add" className="flex flex-col items-center gap-1 active:scale-90 transition-transform touch-manipulation">
-                  <span className="w-14 h-10 rounded-full grid place-items-center text-white relative overflow-hidden" style={{ background: gradient, boxShadow: '0 3px 10px rgba(74,123,184,0.35), 0 1px 2px rgba(74,123,184,0.2), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.12)' }}>
+                  <span className="w-16 h-11 rounded-full grid place-items-center text-white relative overflow-hidden" style={{ background: gradient, boxShadow: '0 3px 10px rgba(74,123,184,0.35), 0 1px 2px rgba(74,123,184,0.2), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.12)' }}>
                     <span className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-full" />
                     <Plus size={20} strokeWidth={2.5} className="relative z-10" />
                   </span>
@@ -224,7 +224,7 @@ export default function Layout() {
             }
             return (
               <NavLink key={n.to} to={n.to} className={`flex flex-col items-center gap-1 active:scale-90 transition-transform touch-manipulation ${active ? '' : 'opacity-70'}`}>
-                <span className="w-14 h-10 rounded-full grid place-items-center text-white relative overflow-hidden" style={{ background: gradient, boxShadow: active ? '0 3px 10px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.12)' : '0 2px 5px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -2px 3px rgba(0,0,0,0.1)' }}>
+                <span className="w-16 h-11 rounded-full grid place-items-center text-white relative overflow-hidden" style={{ background: gradient, boxShadow: active ? '0 3px 10px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.12)' : '0 2px 5px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -2px 3px rgba(0,0,0,0.1)' }}>
                   <span className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-full" />
                   <n.icon size={18} strokeWidth={2} className="relative z-10" />
                 </span>

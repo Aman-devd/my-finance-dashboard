@@ -109,8 +109,8 @@ export default function More() {
         <p className="text-[11px] text-slate-400 leading-4 mb-2">清空、载入演示、导入数据前会自动先存一份；可随时一键恢复。</p>
         {cloud && (
           <div className="flex gap-1 mb-2 p-0.5 bg-slate-100 rounded-xl">
-            <button onClick={() => setHistTab('local')} className={`flex-1 flex items-center justify-center gap-1 text-xs py-1.5 rounded-lg transition ${histTab === 'local' ? 'bg-white text-slate-700 shadow-sm font-medium' : 'text-slate-400'}`}><HardDrive size={12} /> 本机（{history.length}）</button>
-            <button onClick={() => setHistTab('cloud')} className={`flex-1 flex items-center justify-center gap-1 text-xs py-1.5 rounded-lg transition ${histTab === 'cloud' ? 'bg-white text-slate-700 shadow-sm font-medium' : 'text-slate-400'}`}><Cloud size={12} /> 云端（{cloudSnapshots.length}）</button>
+            <button onClick={() => setHistTab('local')} className={`flex-1 flex items-center justify-center gap-1 text-xs py-1.5 rounded-lg transition ${histTab === 'local' ? 'bg-white/70 backdrop-blur-sm text-slate-700 shadow-sm font-medium' : 'text-slate-400'}`}><HardDrive size={12} /> 本机（{history.length}）</button>
+            <button onClick={() => setHistTab('cloud')} className={`flex-1 flex items-center justify-center gap-1 text-xs py-1.5 rounded-lg transition ${histTab === 'cloud' ? 'bg-white/70 backdrop-blur-sm text-slate-700 shadow-sm font-medium' : 'text-slate-400'}`}><Cloud size={12} /> 云端（{cloudSnapshots.length}）</button>
           </div>
         )}
         {histTab === 'local' ? (
