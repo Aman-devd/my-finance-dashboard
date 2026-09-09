@@ -51,6 +51,16 @@ a { -webkit-tap-highlight-color: transparent; transition: color .15s ease, opaci
 /* 底部导航禁止点击缩放 */
 nav a, nav button { touch-action: manipulation; }
 nav a:active, nav button:active { transform: none !important; }
+/* 强制固定底部导航图标大小，杜绝任何变化 */
+nav > div svg {
+  width: 19px !important;
+  height: 19px !important;
+  flex-shrink: 0 !important;
+  stroke-width: 2 !important;
+}
+nav > div span {
+  flex-shrink: 0 !important;
+}
 
 @keyframes fadeIn {
   from { opacity: 0; }
