@@ -1,0 +1,100 @@
+﻿@import "tailwindcss";
+
+@theme {
+  --color-ink: #1d1d1f;
+  --color-brand: #007aff;
+  --color-gain: #34c759;
+  --color-loss: #ff3b30;
+
+  --color-red-500: #ff3b30;
+  --color-red-600: #ff2d1a;
+  --color-emerald-600: #34c759;
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  color: #0d1220;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: linear-gradient(180deg, #fbfcfe 0%, #f6f8fb 100%);
+  background-attachment: fixed;
+}
+.num { font-variant-numeric: tabular-nums lining-nums; font-feature-settings: "tnum" 1, "lnum" 1; }
+h1, h2, h3, h4 { text-wrap: balance; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+
+/* 应用化：正文不可被鼠标选中（输入框除外） */
+body {
+  user-select: none;
+  -webkit-user-select: none;
+}
+input, textarea, select, [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+
+/* 交互与动效优化 */
+* { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled) { transition: transform .12s ease, opacity .12s ease, background-color .12s ease, border-color .12s ease; }
+button:not(:disabled):active { transform: scale(.97); }
+a { -webkit-tap-highlight-color: transparent; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.page-anim { animation: fadeUp .22s ease; }
+
+
+/* ===== 移动端适配与视觉优化 ===== */
+
+/* iOS Safari：聚焦输入框时字号需 >=16px，否则页面被自动放大 */
+input, select, textarea { font-size: 16px !important; }
+
+/* 键盘可访问：聚焦可见环 */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 1px;
+}
+
+/* 弹窗出现动画 */
+@keyframes pop {
+  from { opacity: 0; transform: translateY(10px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+.animate-pop { animation: pop .18s ease; }
+
+/* 顶部安全区（刘海屏） */
+.safe-top { padding-top: max(0.5rem, env(safe-area-inset-top)); }
+
+/* 数字：保持单行（超长时由脚本自动缩小字号，不出屏也不折行） */
+.num { white-space: nowrap; }
+.wrap-anywhere { overflow-wrap: anywhere; }
+
+/* 尊重系统"减弱动态效果"设置 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* 桌面滚动条更细 */
+* { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+
+
+
+
+
+/* 防止手机端横向溢出导致内容错位 */
+html, body { overflow-x: hidden; }
+img, canvas, svg, video { max-width: 100%; }
+#root { min-height: 100%; }
+
+/* 大字号金额输入（覆盖防放大用的 16px 规则） */
+.input-lg { font-size: 30px !important; }
+
+
+
+

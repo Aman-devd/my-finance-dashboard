@@ -1,0 +1,232 @@
+﻿import React, { useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useAuth } from '../lib/auth'
+import { useApp } from '../lib/store'
+import { ensureFits } from '../lib/fitText'
+import { Home, Wallet, List, TrendingUp, Bell, Users, Car, Calculator, Settings, Plus, Target, Activity, Menu, X, Sparkles, PieChart, BarChart3, Coins, CalendarDays, Repeat, Fuel, HandCoins, KeyRound, LogOut } from 'lucide-react'
+
+export interface NavItem { to: string; label: string; icon: React.ComponentType<{ size?: number | string; className?: string }>; section?: boolean }
+
+export const NAV: NavItem[] = [
+  { to: '/', label: '首页', icon: Home },
+  { to: '/transactions', label: '流水', icon: List },
+  { to: '/accounts', label: '账户', icon: Wallet },
+  { to: '/markets', label: '行情', icon: TrendingUp },
+  { to: '/gains', label: '收益', icon: Activity },
+  { to: '/annual', label: '年度', icon: CalendarDays },
+  { to: '/people', label: '人情', icon: Users },
+  { to: '/borrow', label: '借贷', icon: HandCoins },
+  { to: '/cars', label: '车辆', icon: Car },
+  { to: '/tools', label: '工具', icon: Calculator },
+  { to: '/vault', label: '密码箱', icon: KeyRound },
+  { to: '/more', label: '我的', icon: Settings },
+]
+
+const MOBILE_BOTTOM: NavItem[] = [
+  { to: '/', label: '首页', icon: Home },
+  { to: '/markets', label: '行情', icon: TrendingUp },
+  { to: '/add', label: '记一笔', icon: Plus },
+  { to: '/reminders', label: '提醒', icon: Bell },
+  { to: '/more', label: '我的', icon: Settings },
+]
+
+function titleOf(path: string): string {
+  if (path.startsWith('/add')) return '记一笔'
+  if (path.startsWith('/transactions')) return '流水'
+  if (path.startsWith('/accounts')) return '账户'
+  if (path.startsWith('/markets')) return '行情'
+  if (path.startsWith('/annual')) return '年度总结'
+  if (path.startsWith('/holdings')) return '持仓'
+  if (path.startsWith('/people')) return '人情往来'
+  if (path.startsWith('/cars')) return '车辆管理'
+  if (path.startsWith('/reminders')) return '提醒中心'
+  if (path.startsWith('/tools')) return '工具箱'
+  if (path.startsWith('/more')) return '我的'
+  return '首页'
+}
+
+export default function Layout() {
+  const [open, setOpen] = useState(false)
+  const loc = useLocation()
+  const title = titleOf(loc.pathname)
+
+  // 切换页面时回到顶部
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [loc.pathname])
+
+  const { user, logout } = useAuth()
+  const { syncError, saving, lastSavedAt } = useApp()
+  const [justSaved, setJustSaved] = useState(false)
+  useEffect(() => {
+    if (lastSavedAt > 0) {
+      setJustSaved(true)
+      const t = window.setTimeout(() => setJustSaved(false), 1800)
+      return () => window.clearTimeout(t)
+    }
+  }, [lastSavedAt])
+  const [offline, setOffline] = useState(typeof navigator !== 'undefined' ? !navigator.onLine : false)
+  useEffect(() => {
+    const on = () => setOffline(false)
+    const off = () => setOffline(true)
+    window.addEventListener('online', on)
+    window.addEventListener('offline', off)
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off) }
+  }, [])
+  // 数字自适应：内容/尺寸变化后自动缩小超宽数字
+  useEffect(() => {
+    let timer: number | undefined
+    const run = () => { window.clearTimeout(timer); timer = window.setTimeout(() => ensureFits(), 180) }
+    ensureFits()
+    const root = document.getElementById('root') || document.body
+    const mo = new MutationObserver(run)
+    mo.observe(root, { childList: true, subtree: true })
+    window.addEventListener('resize', run)
+    window.addEventListener('orientationchange', run)
+    return () => { mo.disconnect(); window.removeEventListener('resize', run); window.removeEventListener('orientationchange', run); window.clearTimeout(timer) }
+  }, [])
+
+  const NavLinkCls = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition ${isActive ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-600 hover:bg-slate-100'}`
+  const darkNavCls = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition ${isActive ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-600 hover:bg-slate-100'}`
+
+  return (
+    <div className="min-h-full">
+      {offline && !syncError && (
+        <div className="fixed top-2 left-1/2 -translate-x-1/2 z-[70] bg-slate-800/90 text-white text-xs px-3.5 py-1.5 rounded-full shadow-lg">当前离线，数据会先保存在本机，联网后自动同步</div>
+      )}
+      {(syncError || saving || justSaved) && (
+        <div className={"fixed top-2 left-1/2 -translate-x-1/2 z-[70] text-xs px-3.5 py-1.5 rounded-full shadow-lg " + (syncError ? "bg-amber-100 text-amber-800" : saving ? "bg-white/90 text-slate-600 border border-slate-200" : "bg-emerald-50 text-emerald-700")}>
+          {syncError ? syncError : saving ? '正在同步到云端…' : '✓ 已保存到云端'}
+        </div>
+      )}
+      {/* 桌面侧边栏 */}
+      <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col bg-white/75 backdrop-blur-2xl border-r border-black/5 px-3 py-5">
+        <div className="flex items-center gap-2.5 px-3 mb-7">
+          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white grid place-items-center"><Coins size={22} /></div>
+          <div>
+            <div className="font-bold leading-tight text-slate-900">我的财务台</div>
+            <div className="text-[10px] text-slate-400 flex items-center gap-1"><Sparkles size={10} /> 本地演示</div>
+          </div>
+        </div>
+        <nav className="flex-1 space-y-1 overflow-auto">
+          {NAV.map((n) => (
+            <NavLink key={n.to} to={n.to} end={n.to === '/'} className={darkNavCls}>
+              <n.icon size={18} /> {n.label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className="mt-3 px-3 pt-4 border-t border-slate-100">
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-blue-600 text-white grid place-items-center text-sm font-bold uppercase shrink-0">{user?.username?.slice(0, 1)}</span>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-semibold text-slate-800 truncate">{user?.username}</div>
+              <div className="text-[10px] text-slate-400 truncate">{user?.email || '本地演示账号'}</div>
+            </div>
+            <button onClick={() => { if (window.confirm('确定退出登录吗？')) logout() }} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-red-500" title="退出登录"><LogOut size={15} /></button>
+          </div>
+          <div className="text-[10px] text-slate-400 mt-2 leading-4">v3.2 · 云端自动同步</div>
+        </div>
+      </aside>
+
+      {/* 手机顶栏 */}
+      <header className="md:hidden sticky top-0 z-40 bg-white/75 backdrop-blur-2xl border-b border-black/5 flex items-center gap-3 px-4 py-3">
+        <button onClick={() => setOpen(true)} className="p-1 -ml-1 text-slate-600"><Menu size={22} /></button>
+        <div className="flex-1 min-w-0 font-bold text-[17px] truncate">{title}</div>
+        <NavLink to="/reminders" className="relative p-1 text-slate-500"><Bell size={20} /></NavLink>
+      </header>
+
+      {/* 手机抽屉菜单 */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <div className="absolute inset-y-0 left-0 w-72 bg-white shadow-xl p-4 flex flex-col">
+            <div className="flex items-center justify-between mb-4 px-1">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-blue-600 text-white grid place-items-center"><Coins size={18} /></div>
+                <span className="font-bold">我的财务台</span>
+              </div>
+              <button onClick={() => setOpen(false)} className="p-1 text-slate-500"><X size={20} /></button>
+            </div>
+            <nav className="flex-1 space-y-1 overflow-auto">
+              {NAV.map((n) => (
+                <NavLink key={n.to} to={n.to} end={n.to === '/'} onClick={() => setOpen(false)} className={NavLinkCls}>
+                  <n.icon size={18} /> {n.label}
+                </NavLink>
+              ))}
+              <div className="pt-2 mt-2 border-t border-slate-100 px-3 text-[11px] text-slate-400 leading-5">演示数据存于本机，可在「我的」里一键清空或重新载入演示。</div>
+            </nav>
+          </div>
+        </div>
+      )}
+
+      {/* 主内容 */}
+      <main className="md:pl-60">
+        <div key={loc.pathname} className="mx-auto max-w-6xl px-5 py-6 md:py-10 pb-32 md:pb-14 page-anim">
+          <Outlet />
+        </div>
+      </main>
+
+      {/* 手机底部导航 */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/75 backdrop-blur-2xl border-t border-black/5 shadow-[0_-10px_30px_-18px_rgba(15,23,42,.22)]">
+        <div className="grid grid-cols-5 h-[58px] pb-[env(safe-area-inset-bottom)] items-center">
+          {MOBILE_BOTTOM.map((n) => {
+            const active = n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)
+            if (n.to === '/add') {
+              return (
+                <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] text-blue-600">
+                  <span className="w-10 h-10 -mt-5 rounded-full bg-blue-600 text-white grid place-items-center shadow-md"><Plus size={19} /></span>
+                  <span className="font-medium -mt-0.5">记一笔</span>
+                </NavLink>
+              )
+            }
+            return (
+              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] ${active ? 'text-blue-600' : 'text-slate-400'}`}>
+                <span className={`w-9 h-9 rounded-full grid place-items-center transition ${active ? 'bg-blue-50' : ''}`}><n.icon size={19} /></span>
+                <span className={active ? 'font-semibold' : ''}>{n.label}</span>
+              </NavLink>
+            )
+          })}
+        </div>
+      </nav>
+    </div>
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
