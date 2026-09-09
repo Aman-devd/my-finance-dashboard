@@ -179,41 +179,90 @@ function TradeModal({ accountId, accounts, onClose, onSave }: { accountId: strin
   const [customSymbol, setCustomSymbol] = useState('')
   const [customName, setCustomName] = useState('')
   const selected = SYMBOLS.find((s) => s.symbol === symbol) || SYMBOLS[0]
-  const price = selected.hasQuote ? quoteOf(findMeta(selected.symbol)).price : 0
+  const livePrice = selected.hasQuote ? quoteOf(findMeta(selected.symbol)).price : 0
   const [shares, setShares] = useState('')
-  const [px, setPx] = useState(price > 0 ? String(price) : '')
+  const [costPrice, setCostPrice] = useState('')  // 成本价（买入价）
+  const [manualPrice, setManualPrice] = useState('') // 无行情时手动输入的现价
   const [fee, setFee] = useState('')
   const [date, setDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [note, setNote] = useState('')
   const sh = parseInt(shares) || 0
-  const amt = sh * (parseFloat(px) || 0)
+  const cost = parseFloat(costPrice) || 0
+  // 现价：有行情用实时价，无行情用手动输入
+  const currentPrice = livePrice > 0 ? livePrice : (parseFloat(manualPrice) || 0)
+  // 盈亏计算（仅买入模式显示）
+  const profit = side === 'buy' && sh > 0 && cost > 0 && currentPrice > 0 ? (currentPrice - cost) * sh : 0
+  const profitPct = side === 'buy' && cost > 0 ? ((currentPrice - cost) / cost) * 100 : 0
+  const totalCost = sh * cost
   const finalSymbol = symbol === 'custom' ? customSymbol : symbol
   const finalName = symbol === 'custom' ? customName : selected.name.replace(/\(.*\)/, '')
-  const canSave = sh > 0 && finalSymbol.trim() && finalName.trim() && parseFloat(px) > 0
+  const canSave = sh > 0 && finalSymbol.trim() && finalName.trim() && cost > 0
 
   return (
-    <Modal open title={side === 'buy' ? '记录买入' : '记录卖出'} onClose={onClose} footer={<><Button variant="soft" onClick={onClose}>取消</Button><Button disabled={!canSave} onClick={() => onSave({ accountId: acc, symbol: finalSymbol, name: finalName, side, date, price: parseFloat(px) || 0, shares: sh, fee: parseFloat(fee) || undefined, note: note || undefined })}>保存（{amt.toFixed(0)}元）</Button></>}>
+    <Modal open title={side === 'buy' ? '记录买入' : '记录卖出'} onClose={onClose} footer={<><Button variant="soft" onClick={onClose}>取消</Button><Button disabled={!canSave} onClick={() => onSave({ accountId: acc, symbol: finalSymbol, name: finalName, side, date, price: cost, shares: sh, fee: parseFloat(fee) || undefined, note: note || undefined })}>保存（成本 ¥{totalCost.toFixed(0)}）</Button></>}>
       <div className="space-y-3">
         <Segmented options={[{ value: 'buy', label: '买入' }, { value: 'sell', label: '卖出' }]} value={side} onChange={(v) => setSide(v as 'buy' | 'sell')} />
         <Field label="证券账户"><Select value={acc} onChange={(e) => setAcc(e.target.value)}>{accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</Select></Field>
-        <Field label="选择标的"><Select value={symbol} onChange={(e) => { setSymbol(e.target.value); const s = SYMBOLS.find((x) => x.symbol === e.target.value); if (s?.hasQuote) { const p = quoteOf(findMeta(s.symbol)).price; setPx(String(p)) } else { setPx('') } }}>{SYMBOLS.map((s) => <option key={s.symbol} value={s.symbol}>{s.name}</option>)}</Select></Field>
+        <Field label="选择标的"><Select value={symbol} onChange={(e) => { setSymbol(e.target.value); setCostPrice(''); setManualPrice('') }}>{SYMBOLS.map((s) => <option key={s.symbol} value={s.symbol}>{s.name}</option>)}</Select></Field>
         {symbol === 'custom' && (
           <div className="grid grid-cols-2 gap-3">
             <Field label="标的代码"><TextInput value={customSymbol} onChange={(e) => setCustomSymbol(e.target.value)} placeholder="如 sh600519" /></Field>
             <Field label="标的名称"><TextInput value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="如 贵州茅台" /></Field>
           </div>
         )}
-        {selected.hasQuote && <div className="text-xs text-slate-400">当前价 ¥{price.toFixed(3)}（行情来自腾讯财经）</div>}
-        {!selected.hasQuote && <div className="text-xs text-amber-600">该标的暂无实时行情，请手动输入成交价</div>}
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="份额"><TextInput inputMode="numeric" value={shares} onChange={(e) => setShares(e.target.value)} placeholder="如 10000" /></Field>
-          <Field label="成交价"><TextInput inputMode="decimal" value={px} onChange={(e) => setPx(e.target.value)} placeholder="手动输入" /></Field>
+
+        {/* 现价显示 */}
+        <div className="rounded-xl bg-slate-50 border border-slate-200/60 p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-500">当前价</span>
+            {livePrice > 0 ? (
+              <span className="text-sm font-semibold text-slate-900 tabular-nums">¥{livePrice.toFixed(3)} <span className="text-[10px] text-slate-400 font-normal">实时</span></span>
+            ) : (
+              <div className="flex items-center gap-2">
+                <TextInput inputMode="decimal" value={manualPrice} onChange={(e) => setManualPrice(e.target.value)} placeholder="手动输入现价" className="!py-1.5 !px-2.5 !text-sm w-28" />
+                <span className="text-[10px] text-amber-600">无行情</span>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* 成本价和份额 */}
         <div className="grid grid-cols-2 gap-3">
-          <Field label="手续费"><TextInput inputMode="decimal" value={fee} onChange={(e) => setFee(e.target.value)} placeholder="0" /></Field>
+          <Field label={side === 'buy' ? '买入成本价' : '卖出价'}><TextInput inputMode="decimal" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} placeholder="如 2.150" /></Field>
+          <Field label="份额"><TextInput inputMode="numeric" value={shares} onChange={(e) => setShares(e.target.value)} placeholder="如 10000" /></Field>
+        </div>
+
+        {/* 盈亏预览（仅买入模式） */}
+        {side === 'buy' && sh > 0 && cost > 0 && currentPrice > 0 && (
+          <div className={cx('rounded-xl p-3 border', profit >= 0 ? 'bg-red-50 border-red-200/60' : 'bg-green-50 border-green-200/60')}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-slate-500">持仓盈亏（预估）</span>
+              <span className={cx('text-base font-bold tabular-nums', profit >= 0 ? 'text-red-600' : 'text-green-600')}>
+                {profit >= 0 ? '+' : ''}{profit.toFixed(2)}元
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">盈亏比例</span>
+              <span className={cx('font-medium tabular-nums', profit >= 0 ? 'text-red-600' : 'text-green-600')}>
+                {profitPct >= 0 ? '+' : ''}{profitPct.toFixed(2)}%
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs mt-1">
+              <span className="text-slate-400">持仓成本</span>
+              <span className="text-slate-600 tabular-nums">¥{totalCost.toFixed(2)}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs mt-1">
+              <span className="text-slate-400">当前市值</span>
+              <span className="text-slate-600 tabular-nums">¥{(sh * currentPrice).toFixed(2)}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="手续费（可选）"><TextInput inputMode="decimal" value={fee} onChange={(e) => setFee(e.target.value)} placeholder="0" /></Field>
           <Field label="日期"><DateInput value={date} onChange={(e) => setDate(e.target.value)} /></Field>
         </div>
-        <Field label="备注"><TextInput value={note} onChange={(e) => setNote(e.target.value)} placeholder="如：定投 / 波段补仓" /></Field>
+        <Field label="备注（可选）"><TextInput value={note} onChange={(e) => setNote(e.target.value)} placeholder="如：定投 / 波段补仓" /></Field>
       </div>
     </Modal>
   )
