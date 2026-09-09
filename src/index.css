@@ -231,104 +231,8 @@ input, textarea, select, [contenteditable="true"] {
 }
 
 
-/* ===== 简洁柔和立体按钮系统 ===== */
+/* ===== 液态玻璃水晶质感按钮系统 ===== */
 .btn-primary {
-  position: relative;
-  background: linear-gradient(180deg, #5ba9ff 0%, #2b8cff 40%, #0a72e8 70%, #005bbf 100%);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 14px;
-  font-weight: 600;
-  box-shadow: 
-    0 4px 14px rgba(10, 114, 232, 0.35),
-    0 1px 3px rgba(10, 114, 232, 0.2),
-    inset 0 1px 1px rgba(255, 255, 255, 0.4),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.12);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
-
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 100%);
-  border-radius: 14px 14px 0 0;
-  pointer-events: none;
-}
-
-.btn-primary:hover {
-  box-shadow: 
-    0 6px 20px rgba(10, 114, 232, 0.45),
-    0 2px 5px rgba(10, 114, 232, 0.25),
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  box-shadow: 
-    0 2px 8px rgba(10, 114, 232, 0.3),
-    0 1px 2px rgba(10, 114, 232, 0.15),
-    inset 0 1px 3px rgba(0, 0, 0, 0.18),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.15);
-  transform: translateY(0);
-}
-
-.btn-glass {
-  position: relative;
-  background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.65) 100%);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  color: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  border-radius: 14px;
-  font-weight: 500;
-  box-shadow: 
-    0 3px 12px rgba(15, 23, 42, 0.07),
-    0 1px 2px rgba(15, 23, 42, 0.03),
-    inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    inset 0 -1px 2px rgba(15, 23, 42, 0.04);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
-
-.btn-glass::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 100%);
-  border-radius: 14px 14px 0 0;
-  pointer-events: none;
-}
-
-.btn-glass:hover {
-  background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-  box-shadow: 
-    0 5px 16px rgba(15, 23, 42, 0.09),
-    0 1px 3px rgba(15, 23, 42, 0.04),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95),
-    inset 0 -1px 2px rgba(15, 23, 42, 0.04);
-  transform: translateY(-1px);
-}
-
-.btn-glass:active {
-  box-shadow: 
-    0 1px 5px rgba(15, 23, 42, 0.05),
-    0 1px 1px rgba(15, 23, 42, 0.02),
-    inset 0 1px 3px rgba(15, 23, 42, 0.07),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.5);
-  transform: translateY(0);
-}
-
-/* 中央悬浮按钮 - 液态玻璃水晶质感 */
-.fab-button {
   position: relative;
   background: 
     linear-gradient(180deg, rgba(120, 190, 255, 0.55) 0%, rgba(60, 150, 255, 0.45) 30%, rgba(20, 110, 230, 0.5) 60%, rgba(10, 80, 190, 0.6) 100%);
@@ -336,11 +240,125 @@ input, textarea, select, [contenteditable="true"] {
   -webkit-backdrop-filter: blur(8px) saturate(180%);
   color: white;
   border: 1.5px solid rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
+  border-radius: 999px;
+  font-weight: 600;
   box-shadow: 
-    0 10px 30px rgba(30, 120, 255, 0.45),
-    0 4px 12px rgba(30, 120, 255, 0.3),
-    0 0 20px rgba(80, 170, 255, 0.3),
+    0 6px 20px rgba(30, 120, 255, 0.4),
+    0 2px 6px rgba(30, 120, 255, 0.25),
+    0 0 15px rgba(80, 170, 255, 0.25),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.55),
+    inset 0 -3px 6px rgba(10, 60, 150, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 8%;
+  left: 8%;
+  width: 84%;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  border-radius: 999px 999px 50% 50%;
+  pointer-events: none;
+}
+
+.btn-primary:hover {
+  box-shadow: 
+    0 8px 26px rgba(30, 120, 255, 0.5),
+    0 3px 8px rgba(30, 120, 255, 0.3),
+    0 0 20px rgba(80, 170, 255, 0.35),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 6px rgba(10, 60, 150, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  box-shadow: 
+    0 3px 10px rgba(30, 120, 255, 0.35),
+    0 1px 3px rgba(30, 120, 255, 0.2),
+    0 0 10px rgba(80, 170, 255, 0.2),
+    inset 0 2px 5px rgba(10, 60, 150, 0.35),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transform: translateY(0);
+}
+
+.btn-glass {
+  position: relative;
+  background: 
+    linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.55) 100%);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  color: #1e293b;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  font-weight: 500;
+  box-shadow: 
+    0 4px 14px rgba(15, 23, 42, 0.08),
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 0 12px rgba(255, 255, 255, 0.3),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(15, 23, 42, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.btn-glass::before {
+  content: '';
+  position: absolute;
+  top: 8%;
+  left: 6%;
+  width: 88%;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  border-radius: 999px 999px 50% 50%;
+  pointer-events: none;
+}
+
+.btn-glass:hover {
+  background: 
+    linear-gradient(180deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.6) 100%);
+  box-shadow: 
+    0 6px 18px rgba(15, 23, 42, 0.1),
+    0 2px 5px rgba(15, 23, 42, 0.05),
+    0 0 16px rgba(255, 255, 255, 0.4),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 4px rgba(15, 23, 42, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-glass:active {
+  box-shadow: 
+    0 2px 8px rgba(15, 23, 42, 0.06),
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 0 8px rgba(255, 255, 255, 0.2),
+    inset 0 2px 4px rgba(15, 23, 42, 0.08),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(0);
+}
+
+/* 中央悬浮按钮 - 液态玻璃水晶质感 长椭圆形 */
+.fab-button {
+  position: relative;
+  background: 
+    linear-gradient(180deg, rgba(120, 190, 255, 0.6) 0%, rgba(60, 150, 255, 0.5) 30%, rgba(20, 110, 230, 0.55) 60%, rgba(10, 80, 190, 0.65) 100%);
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  color: white;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  box-shadow: 
+    0 8px 24px rgba(30, 120, 255, 0.45),
+    0 3px 8px rgba(30, 120, 255, 0.3),
+    0 0 18px rgba(80, 170, 255, 0.3),
     inset 0 2px 3px rgba(255, 255, 255, 0.6),
     inset 0 -4px 8px rgba(10, 60, 150, 0.35),
     inset 0 0 0 1px rgba(255, 255, 255, 0.15);
@@ -352,22 +370,22 @@ input, textarea, select, [contenteditable="true"] {
 .fab-button::before {
   content: '';
   position: absolute;
-  top: 5%;
+  top: 10%;
   left: 10%;
   width: 80%;
-  height: 48%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.2) 45%, rgba(255,255,255,0) 100%);
-  border-radius: 50% 50% 45% 45%;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%);
+  border-radius: 999px 999px 50% 50%;
   pointer-events: none;
 }
 
 .fab-button::after {
   content: '';
   position: absolute;
-  top: 10%;
-  left: 18%;
-  width: 20%;
-  height: 16%;
+  top: 15%;
+  left: 20%;
+  width: 18%;
+  height: 30%;
   background: radial-gradient(ellipse at center, rgba(255,255,255,0.85) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
@@ -375,24 +393,24 @@ input, textarea, select, [contenteditable="true"] {
 
 .fab-button:hover {
   box-shadow: 
-    0 14px 38px rgba(30, 120, 255, 0.55),
-    0 6px 16px rgba(30, 120, 255, 0.35),
-    0 0 30px rgba(80, 170, 255, 0.4),
+    0 12px 32px rgba(30, 120, 255, 0.55),
+    0 5px 12px rgba(30, 120, 255, 0.35),
+    0 0 25px rgba(80, 170, 255, 0.4),
     inset 0 2px 3px rgba(255, 255, 255, 0.65),
     inset 0 -4px 8px rgba(10, 60, 150, 0.35),
     inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px) scale(1.06);
+  transform: translateY(-2px) scale(1.04);
 }
 
 .fab-button:active {
   box-shadow: 
-    0 5px 16px rgba(30, 120, 255, 0.4),
-    0 2px 6px rgba(30, 120, 255, 0.25),
+    0 4px 14px rgba(30, 120, 255, 0.4),
+    0 2px 5px rgba(30, 120, 255, 0.25),
     0 0 12px rgba(80, 170, 255, 0.25),
-    inset 0 3px 8px rgba(10, 60, 150, 0.4),
+    inset 0 3px 7px rgba(10, 60, 150, 0.4),
     inset 0 -1px 2px rgba(255, 255, 255, 0.3),
     inset 0 0 0 1px rgba(255, 255, 255, 0.15);
-  transform: translateY(0) scale(0.96);
+  transform: translateY(0) scale(0.97);
 }
 
 /* 交互与动效优化 */

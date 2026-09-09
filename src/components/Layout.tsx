@@ -204,7 +204,7 @@ export default function Layout() {
             if (n.to === '/add') {
               return (
                 <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] text-[#0071e3] active:scale-100 touch-manipulation">
-                  <span className="fab-button w-11 h-11 -mt-4 rounded-full text-white grid place-items-center"><Plus size={20} strokeWidth={2.5} /></span>
+                  <span className="fab-button w-16 h-11 -mt-5 text-white grid place-items-center"><Plus size={20} strokeWidth={2.5} /></span>
                   <span className="font-medium -mt-0.5">记一笔</span>
                 </NavLink>
               )
