@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useApp } from '../lib/store'
 import { accountAssetValue, totalAssets, totalDebt, netWorth, holdingsOf } from '../lib/values'
 import { moneyShort } from '../lib/format'
-import { Button, Card, Empty, Field, Modal, PageHead, Select, TextInput, TextArea, Tag, cx } from '../components/ui'
+import { Button, Card, DateInput, Empty, Field, Modal, PageHead, Select, TextInput, TextArea, Tag, cx } from '../components/ui'
 import { Plus, Pencil, Trash2, HandCoins, Landmark, Coins, CreditCard, Smartphone, Wallet, Briefcase, TrendingUp } from 'lucide-react'
 import type { Account, AccountCategory } from '../types'
 import dayjs from 'dayjs'
@@ -151,7 +151,7 @@ function AccountForm({ account, onClose, onSave }: { account?: Account; onClose:
             <div className="grid grid-cols-3 gap-2">
               <Field label="年利率%"><TextInput inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} /></Field>
               <Field label="月供"><TextInput inputMode="decimal" value={monthly} onChange={(e) => setMonthly(e.target.value)} /></Field>
-              <Field label="还款日"><TextInput inputMode="numeric" value={dueDay} onChange={(e) => setDueDay(e.target.value)} /></Field>
+              <Field label="还款日"><Select value={dueDay} onChange={(e) => setDueDay(e.target.value)}>{Array.from({ length: 28 }, (_, i) => i + 1).map((d) => <option key={d} value={String(d)}>{d}号</option>)}</Select></Field>
             </div>
             <div className="text-[11px] text-slate-400">系统会在还款日前提醒你，并在你还款后自动减少欠款。</div>
           </>
@@ -175,7 +175,7 @@ function RepayModal({ loan, cashAccounts, onClose, onOk }: { loan: Account; cash
         <Field label="还款账户"><Select value={source} onChange={(e) => setSource(e.target.value)}>{cashAccounts.map((a) => <option key={a.id} value={a.id}>{a.name}（¥{a.balance.toFixed(0)}）</option>)}</Select></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="还款金额"><TextInput inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
-          <Field label="日期"><TextInput type="date" value={date} onChange={(e) => setDate(e.target.value)} /></Field>
+          <Field label="日期"><DateInput value={date} onChange={(e) => setDate(e.target.value)} /></Field>
         </div>
         {amt > loan.balance && <div className="text-xs text-amber-600">还款金额不能超过剩余欠款 ¥{loan.balance.toFixed(0)}。</div>}
         {amt < loan.balance && loan.balance > 0 && (
