@@ -26,14 +26,14 @@ export function SectionTitle({ children, right }: { children: React.ReactNode; r
 type BtnVariant = 'primary' | 'ghost' | 'danger' | 'soft' | 'outline'
 export function Button({ variant = 'primary', className, children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: BtnVariant }) {
   const styles: Record<BtnVariant, string> = {
-    primary: 'btn-primary',
-    ghost: 'text-slate-500 hover:bg-slate-100/60 hover:text-slate-700',
-    danger: 'bg-red-50/80 text-red-600 hover:bg-red-100/80 hover:text-red-700 backdrop-blur-sm',
-    soft: 'btn-glass',
-    outline: 'btn-glass',
+    primary: 'bg-[#0071e3] text-white shadow-[0_1px_3px_rgba(0,113,227,0.3),0_1px_2px_rgba(0,113,227,0.2)] hover:bg-[#0077ed] hover:shadow-[0_4px_12px_rgba(0,113,227,0.35)] active:bg-[#006edb] active:shadow-[0_1px_2px_rgba(0,113,227,0.3)]',
+    ghost: 'text-slate-500 hover:bg-slate-100 hover:text-slate-700',
+    danger: 'bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700',
+    soft: 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900',
+    outline: 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900',
   }
   return (
-    <button className={cx('inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-sm font-medium disabled:opacity-50 disabled:pointer-events-none', styles[variant], className)} {...rest}>
+    <button className={cx('inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]', styles[variant], className)} {...rest}>
       {children}
     </button>
   )
