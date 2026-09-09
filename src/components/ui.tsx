@@ -1,5 +1,5 @@
 ﻿import React from 'react'
-import { Inbox, X } from 'lucide-react'
+import { Inbox, X, Calendar } from 'lucide-react'
 
 export function cx(...cls: (string | false | null | undefined)[]) {
   return cls.filter(Boolean).join(' ')
@@ -58,6 +58,16 @@ export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
 }
 export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return <select {...props} className={cx(inputCls, props.className)} />
+}
+
+// 日期输入框：带日历图标，确保移动端弹出日期选择器
+export function DateInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <div className="relative">
+      <input type="date" {...props} className={cx(inputCls, 'pr-9', props.className)} />
+      <Calendar size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+    </div>
+  )
 }
 
 export function Modal({ open, title, onClose, children, footer }: { open: boolean; title: string; onClose: () => void; children: React.ReactNode; footer?: React.ReactNode }) {

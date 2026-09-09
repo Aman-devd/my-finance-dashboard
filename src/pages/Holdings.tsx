@@ -4,7 +4,7 @@ import { moneyShort } from '../lib/format'
 import { useApp } from '../lib/store'
 import { investmentView, investmentTotals } from '../lib/values'
 import { findMeta, quoteOf, klineSeries } from '../lib/market'
-import { Button, Card, Empty, Field, Modal, PageHead, Select, Segmented, TextInput, Tag, cx } from '../components/ui'
+import { Button, Card, DateInput, Empty, Field, Modal, PageHead, Select, Segmented, Tag, TextInput, cx } from '../components/ui'
 import { EChart, lineOption, barOption, pieOption } from '../components/charts'
 import { Plus, TrendingUp, TrendingDown, Trash2 } from 'lucide-react'
 import type { NewTrade } from '../lib/store'
@@ -166,28 +166,52 @@ export default function Holdings() {
 function TradeModal({ accountId, accounts, onClose, onSave }: { accountId: string; accounts: { id: string; name: string }[]; onClose: () => void; onSave: (t: NewTrade) => void }) {
   const [side, setSide] = useState<'buy' | 'sell'>('buy')
   const [acc, setAcc] = useState(accountId)
-  const price = quoteOf(findMeta('sh513100')).price
+  // 预设标的列表
+  const SYMBOLS = [
+    { symbol: 'sh513100', name: '纳指100ETF(513100)', hasQuote: true },
+    { symbol: 'sh510300', name: '沪深300ETF(510300)', hasQuote: false },
+    { symbol: 'sh510500', name: '中证500ETF(510500)', hasQuote: false },
+    { symbol: 'sz159915', name: '创业板ETF(159915)', hasQuote: false },
+    { symbol: 'sh588000', name: '科创50ETF(588000)', hasQuote: false },
+    { symbol: 'custom', name: '自定义标的...', hasQuote: false },
+  ]
+  const [symbol, setSymbol] = useState('sh513100')
+  const [customSymbol, setCustomSymbol] = useState('')
+  const [customName, setCustomName] = useState('')
+  const selected = SYMBOLS.find((s) => s.symbol === symbol) || SYMBOLS[0]
+  const price = selected.hasQuote ? quoteOf(findMeta(selected.symbol)).price : 0
   const [shares, setShares] = useState('')
-  const [px, setPx] = useState(String(price))
+  const [px, setPx] = useState(price > 0 ? String(price) : '')
   const [fee, setFee] = useState('')
   const [date, setDate] = useState(dayjs().format('YYYY-MM-DD'))
   const [note, setNote] = useState('')
   const sh = parseInt(shares) || 0
   const amt = sh * (parseFloat(px) || 0)
+  const finalSymbol = symbol === 'custom' ? customSymbol : symbol
+  const finalName = symbol === 'custom' ? customName : selected.name.replace(/\(.*\)/, '')
+  const canSave = sh > 0 && finalSymbol.trim() && finalName.trim() && parseFloat(px) > 0
 
   return (
-    <Modal open title={side === 'buy' ? '记录买入' : '记录卖出'} onClose={onClose} footer={<><Button variant="soft" onClick={onClose}>取消</Button><Button disabled={sh <= 0} onClick={() => onSave({ accountId: acc, symbol: 'sh513100', name: '纳指100ETF', side, date, price: parseFloat(px) || 0, shares: sh, fee: parseFloat(fee) || undefined, note: note || undefined })}>保存（{amt.toFixed(0)}元）</Button></>}>
+    <Modal open title={side === 'buy' ? '记录买入' : '记录卖出'} onClose={onClose} footer={<><Button variant="soft" onClick={onClose}>取消</Button><Button disabled={!canSave} onClick={() => onSave({ accountId: acc, symbol: finalSymbol, name: finalName, side, date, price: parseFloat(px) || 0, shares: sh, fee: parseFloat(fee) || undefined, note: note || undefined })}>保存（{amt.toFixed(0)}元）</Button></>}>
       <div className="space-y-3">
         <Segmented options={[{ value: 'buy', label: '买入' }, { value: 'sell', label: '卖出' }]} value={side} onChange={(v) => setSide(v as 'buy' | 'sell')} />
         <Field label="证券账户"><Select value={acc} onChange={(e) => setAcc(e.target.value)}>{accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</Select></Field>
-        <div className="text-xs text-slate-400">标的：纳指100ETF（sh513100），当前价 ¥{price.toFixed(3)}</div>
+        <Field label="选择标的"><Select value={symbol} onChange={(e) => { setSymbol(e.target.value); const s = SYMBOLS.find((x) => x.symbol === e.target.value); if (s?.hasQuote) { const p = quoteOf(findMeta(s.symbol)).price; setPx(String(p)) } else { setPx('') } }}>{SYMBOLS.map((s) => <option key={s.symbol} value={s.symbol}>{s.name}</option>)}</Select></Field>
+        {symbol === 'custom' && (
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="标的代码"><TextInput value={customSymbol} onChange={(e) => setCustomSymbol(e.target.value)} placeholder="如 sh600519" /></Field>
+            <Field label="标的名称"><TextInput value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="如 贵州茅台" /></Field>
+          </div>
+        )}
+        {selected.hasQuote && <div className="text-xs text-slate-400">当前价 ¥{price.toFixed(3)}（行情来自腾讯财经）</div>}
+        {!selected.hasQuote && <div className="text-xs text-amber-600">该标的暂无实时行情，请手动输入成交价</div>}
         <div className="grid grid-cols-2 gap-3">
           <Field label="份额"><TextInput inputMode="numeric" value={shares} onChange={(e) => setShares(e.target.value)} placeholder="如 10000" /></Field>
-          <Field label="成交价"><TextInput inputMode="decimal" value={px} onChange={(e) => setPx(e.target.value)} /></Field>
+          <Field label="成交价"><TextInput inputMode="decimal" value={px} onChange={(e) => setPx(e.target.value)} placeholder="手动输入" /></Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="手续费"><TextInput inputMode="decimal" value={fee} onChange={(e) => setFee(e.target.value)} placeholder="0" /></Field>
-          <Field label="日期"><TextInput type="date" value={date} onChange={(e) => setDate(e.target.value)} /></Field>
+          <Field label="日期"><DateInput value={date} onChange={(e) => setDate(e.target.value)} /></Field>
         </div>
         <Field label="备注"><TextInput value={note} onChange={(e) => setNote(e.target.value)} placeholder="如：定投 / 波段补仓" /></Field>
       </div>

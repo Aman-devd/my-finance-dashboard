@@ -1,7 +1,7 @@
 ﻿import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { useApp } from '../lib/store'
-import { Button, Card, Empty, Field, Modal, PageHead, Select, Tag, TextInput, cx } from '../components/ui'
+import { Button, Card, DateInput, Empty, Field, Modal, PageHead, Select, Tag, TextInput, cx } from '../components/ui'
 import { Plus, Pencil, Trash2, HandCoins, CheckCircle2, RotateCcw } from 'lucide-react'
 import type { Borrow, BorrowKind } from '../types'
 
@@ -105,8 +105,8 @@ function BorrowForm({ item, onClose, onSave }: { item?: Borrow; onClose: () => v
           <Field label="金额"><TextInput inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="发生日期"><TextInput type="date" value={date} onChange={(e) => setDate(e.target.value)} /></Field>
-          <Field label="约定还款日（可选）"><TextInput type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></Field>
+          <Field label="发生日期"><DateInput value={date} onChange={(e) => setDate(e.target.value)} /></Field>
+          <Field label="约定还款日（可选）"><DateInput value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></Field>
         </div>
         <Field label="备注"><TextInput value={note} onChange={(e) => setNote(e.target.value)} placeholder="如：为什么借/利息约定" /></Field>
         <div className="text-[11px] text-slate-400">设了还款日会进入「提醒中心-理财提醒」，到期前自动提醒你。</div>
