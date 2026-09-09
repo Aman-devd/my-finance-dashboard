@@ -73,10 +73,13 @@ export default function Layout() {
     window.addEventListener('offline', off)
     return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off) }
   }, [])
-  // 数字自适应：内容/尺寸变化后自动缩小超宽数字
+  // 数字自适应：内容/尺寸变化后立即缩小超宽数字，避免先大后小
   useEffect(() => {
     let timer: number | undefined
-    const run = () => { window.clearTimeout(timer); timer = window.setTimeout(() => ensureFits(), 180) }
+    const run = () => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => ensureFits(), 0)
+    }
     ensureFits()
     const root = document.getElementById('root') || document.body
     const mo = new MutationObserver(run)

@@ -4,7 +4,6 @@ export function ensureFits(): void {
   els.forEach((el) => {
     const base = el.dataset.fitBase || String(parseFloat(window.getComputedStyle(el).fontSize) || 14)
     el.dataset.fitBase = base
-    el.style.fontSize = base + 'px'
 
     // 向上找到真正溢出的容器（最多 5 层）
     let anc: HTMLElement | null = el.parentElement
@@ -13,9 +12,17 @@ export function ensureFits(): void {
       if (anc.scrollWidth > anc.clientWidth + 1) { target = anc; break }
       anc = anc.parentElement
     }
-    if (!target) return
+    if (!target) {
+      // 不溢出时，如果当前字号小于基础字号，恢复到基础字号
+      const current = parseFloat(window.getComputedStyle(el).fontSize)
+      if (current < parseFloat(base)) {
+        el.style.fontSize = base + 'px'
+      }
+      return
+    }
 
-    let fs = parseFloat(base)
+    // 从当前字号开始缩小，不要先重置为基础字号（避免先大后小的闪烁）
+    let fs = parseFloat(window.getComputedStyle(el).fontSize)
     const min = 9
     let guard = 0
     while (fs > min && guard++ < 30 && target.scrollWidth > target.clientWidth + 1) {
