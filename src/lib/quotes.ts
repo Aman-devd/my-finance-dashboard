@@ -78,6 +78,39 @@ export function getLiveQuote(code: string): LiveQuote | undefined {
   return cache.get(code)
 }
 
+/** 单独查询某个标的的实时行情（用于用户输入代码后自动查找） */
+export async function fetchQuoteByCode(code: string): Promise<{ quote: LiveQuote; name: string } | null> {
+  try {
+    const url = 'https://qt.gtimg.cn/q=' + code
+    const r = await fetch(url, { cache: 'no-store' })
+    const text = await r.text()
+    const re = /v_(\w+)="([^"]*)"/g
+    const m = re.exec(text)
+    if (!m) return null
+    const a = m[2].split('~')
+    if (a.length < 35) return null
+    const num = (i: number) => { const v = parseFloat(a[i]); return Number.isFinite(v) ? v : 0 }
+    const quote: LiveQuote = {
+      symbol: m[1],
+      price: num(3),
+      prevClose: num(4),
+      open: num(5),
+      high: num(33),
+      low: num(34),
+      change: num(31),
+      changePct: num(32),
+      time: (a[30] || '').trim(),
+    }
+    const name = (a[1] || '').trim()
+    if (quote.price <= 0) return null
+    // 缓存起来，后续轮询也能用到
+    cache.set(m[1], quote)
+    return { quote, name }
+  } catch {
+    return null
+  }
+}
+
 /** 让使用真实行情的组件在每次刷新后重新渲染；返回刷新计数 */
 export function useLiveQuotes(): number {
   const [n, set] = useState(0)

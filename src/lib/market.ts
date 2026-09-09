@@ -36,6 +36,20 @@ export const ETF: MarketMeta = { symbol: 'sh513100', name: '纳指100ETF(513100)
 
 export const ALL_MARKETS: MarketMeta[] = [...INDICES, ETF]
 
+/** 根据股票代码动态创建标的元数据（用于用户输入任意代码） */
+export function createMetaFromCode(symbol: string, name: string): MarketMeta {
+  const isUs = symbol.startsWith('us')
+  const isCn = symbol.startsWith('sh') || symbol.startsWith('sz')
+  return {
+    symbol,
+    name: name || symbol,
+    exchange: isUs ? 'US' : 'CN',
+    base: 0,
+    decimals: isCn ? 3 : 2,
+    session: isUs ? [21.5, 4] : [9.5, 15],
+  }
+}
+
 function tencentCodeOf(meta: MarketMeta): string {
   const map: Record<string, string> = { NDX: 'usNDX', IXIC: 'usIXIC', SPX: 'usINX', DJI: 'usDJI', sh513100: 'sh513100' }
   return map[meta.symbol] || meta.symbol

@@ -125,6 +125,7 @@ interface StoreApi {
   deleteCategory: (id: string) => void
   applyTrade: (t: NewTrade) => void
   deleteTrade: (id: string) => void
+  deleteHolding: (accountId: string, symbol: string) => void
   updateHoldingNote: (id: string, note?: string) => void
   addPerson: (p: Omit<Person, 'id'>) => void
   updatePerson: (id: string, patch: Partial<Person>) => void
@@ -521,7 +522,61 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const trade: Trade = { ...t, id: uid() }
         return { ...d, holdings, trades: [...d.trades, trade], accounts: d.accounts.map((a) => (a.id === acc.id ? acc : a)) }
       }),
-      deleteTrade: (id) => setData((d) => ({ ...d, trades: d.trades.filter((t) => t.id !== id) })),
+      deleteTrade: (id) => setData((d) => {
+        const trade = d.trades.find((t) => t.id === id)
+        if (!trade) return d
+        const acc = d.accounts.find((a) => a.id === trade.accountId)
+        if (!acc) return { ...d, trades: d.trades.filter((t) => t.id !== id) }
+        // 回滚持仓和账户余额
+        let holdings = [...d.holdings]
+        const holding = holdings.find((h) => h.accountId === trade.accountId && h.symbol === trade.symbol)
+        if (trade.side === 'buy') {
+          // 回滚买入：减少持仓份额，恢复账户余额
+          if (holding) {
+            const newShares = holding.shares - trade.shares
+            if (newShares <= 0) {
+              holdings = holdings.filter((h) => h.id !== holding.id)
+            } else {
+              // 回退平均成本（简化处理：直接减去成本）
+              const totalCost = holding.shares * holding.avgCost
+              const tradeCost = trade.shares * trade.price + (trade.fee || 0)
+              const newAvgCost = newShares > 0 ? (totalCost - tradeCost) / newShares : 0
+              holdings = holdings.map((h) => h.id === holding.id ? { ...h, shares: newShares, avgCost: Math.max(0, newAvgCost) } : h)
+            }
+          }
+          acc.balance += trade.shares * trade.price + (trade.fee || 0)
+        } else {
+          // 回滚卖出：增加持仓份额，扣减账户余额
+          if (holding) {
+            holdings = holdings.map((h) => h.id === holding.id ? { ...h, shares: h.shares + trade.shares } : h)
+          } else {
+            holdings = [...holdings, { id: uid(), accountId: trade.accountId, symbol: trade.symbol, name: trade.name, shares: trade.shares, avgCost: trade.price }]
+          }
+          acc.balance -= trade.shares * trade.price - (trade.fee || 0)
+        }
+        return { ...d, holdings, trades: d.trades.filter((t) => t.id !== id), accounts: d.accounts.map((a) => (a.id === acc.id ? acc : a)) }
+      }),
+      deleteHolding: (accountId, symbol) => setData((d) => {
+        // 删除该账户下该标的的所有交易记录，并回滚持仓和账户余额
+        const relatedTrades = d.trades.filter((t) => t.accountId === accountId && t.symbol === symbol)
+        if (relatedTrades.length === 0) return d
+        const acc = d.accounts.find((a) => a.id === accountId)
+        let balanceDelta = 0
+        for (const trade of relatedTrades) {
+          if (trade.side === 'buy') {
+            balanceDelta += trade.shares * trade.price + (trade.fee || 0)
+          } else {
+            balanceDelta -= trade.shares * trade.price - (trade.fee || 0)
+          }
+        }
+        const accounts = acc ? d.accounts.map((a) => (a.id === acc.id ? { ...a, balance: a.balance + balanceDelta } : a)) : d.accounts
+        return {
+          ...d,
+          holdings: d.holdings.filter((h) => !(h.accountId === accountId && h.symbol === symbol)),
+          trades: d.trades.filter((t) => !(t.accountId === accountId && t.symbol === symbol)),
+          accounts,
+        }
+      }),
       updateHoldingNote: (id, note) => setData((d) => ({ ...d, holdings: d.holdings.map((h) => (h.id === id ? { ...h, note } : h)) })),
       addPerson: (p) => setData((d) => ({ ...d, people: [...d.people, { ...p, id: uid() }] })),
       updatePerson: (id, patch) => setData((d) => ({ ...d, people: d.people.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
