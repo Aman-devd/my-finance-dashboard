@@ -24,11 +24,10 @@ const subs = new Set<() => void>()
 
 /** 动态添加标的到行情轮询列表（用于用户持仓的非默认标的） */
 export function addQuoteSymbol(code: string): void {
-  if (!CODES.has(code)) {
-    CODES.add(code)
-    // 立即刷新一次行情
-    void refreshQuotes()
-  }
+  const isNew = !CODES.has(code)
+  CODES.add(code)
+  // 无论是否新添加，都立即刷新一次行情（确保页面刷新后缓存丢失时能立即获取数据）
+  void refreshQuotes()
 }
 
 function notify() {
