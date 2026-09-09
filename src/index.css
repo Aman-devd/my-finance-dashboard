@@ -1,4 +1,5 @@
 ﻿@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @theme {
   --color-ink: #1d1d1f;
@@ -14,40 +15,131 @@
 html, body, #root { height: 100%; }
 body {
   margin: 0;
-  color: #e8ecf1;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  color: #1e293b;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(160deg, #0f172a 0%, #1e293b 35%, #334155 70%, #475569 100%);
+  background: #e8f0fe;
   background-attachment: fixed;
   text-rendering: optimizeLegibility;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
 }
 
-/* 液态玻璃效果 */
+/* 艺术化渐变背景 - 明亮彩色波浪模拟参考设计 */
+body::before {
+  content: '';
+  position: fixed;
+  top: -25%;
+  left: -20%;
+  width: 75%;
+  height: 65%;
+  background: 
+    radial-gradient(ellipse 60% 50% at 30% 40%, rgba(59, 130, 246, 0.6) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 55% 30%, rgba(14, 165, 233, 0.55) 0%, transparent 50%),
+    radial-gradient(ellipse 45% 35% at 45% 55%, rgba(6, 182, 212, 0.5) 0%, transparent 45%),
+    radial-gradient(ellipse 35% 30% at 70% 40%, rgba(139, 92, 246, 0.4) 0%, transparent 40%);
+  border-radius: 50%;
+  filter: blur(45px);
+  z-index: 0;
+  pointer-events: none;
+  animation: float1 20s ease-in-out infinite;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -25%;
+  right: -15%;
+  width: 70%;
+  height: 60%;
+  background: 
+    radial-gradient(ellipse 55% 45% at 65% 55%, rgba(56, 189, 248, 0.55) 0%, transparent 50%),
+    radial-gradient(ellipse 45% 40% at 40% 65%, rgba(125, 211, 252, 0.5) 0%, transparent 45%),
+    radial-gradient(ellipse 40% 35% at 55% 45%, rgba(251, 191, 36, 0.4) 0%, transparent 40%),
+    radial-gradient(ellipse 30% 25% at 30% 60%, rgba(236, 72, 153, 0.3) 0%, transparent 35%);
+  border-radius: 50%;
+  filter: blur(55px);
+  z-index: 0;
+  pointer-events: none;
+  animation: float2 25s ease-in-out infinite;
+}
+
+/* 中间暖色光晕 - 金色点缀 */
+#root::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(ellipse at center, rgba(251, 191, 36, 0.3) 0%, rgba(251, 146, 60, 0.15) 30%, transparent 55%);
+  border-radius: 50%;
+  filter: blur(65px);
+  z-index: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: glow 15s ease-in-out infinite;
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(25px, -15px) scale(1.05); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-20px, 12px) scale(1.08); }
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* 精致液态玻璃效果 - 浅色背景版本 */
 .glass {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 
+    0 10px 36px rgba(15, 23, 42, 0.09),
+    0 2px 6px rgba(15, 23, 42, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.85),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.45);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(36px) saturate(220%);
+  -webkit-backdrop-filter: blur(36px) saturate(220%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 14px 44px rgba(15, 23, 42, 0.11),
+    0 3px 8px rgba(15, 23, 42, 0.05),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.55);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.06);
-  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow: 
+    0 6px 24px rgba(15, 23, 42, 0.07),
+    0 2px 6px rgba(15, 23, 42, 0.03),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.4);
+  border-radius: 28px;
 }
 
 /* 文字颜色适配深色背景 */
@@ -55,9 +147,73 @@ body {
 .text-secondary { color: #94a3b8; }
 .text-muted { color: #64748b; }
 
-.num { font-variant-numeric: tabular-nums lining-nums; font-feature-settings: "tnum" 1, "lnum" 1; }
-h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -0.01em; color: #f1f5f9; }
-::selection { background: rgba(0, 113, 227, 0.3); }
+.num { font-variant-numeric: tabular-nums lining-nums; font-feature-settings: "tnum" 1, "lnum" 1, "cv11" 1; white-space: nowrap; }
+
+/* ===== 统一数字层级系统 ===== */
+/* 超大金额 - 净资产等核心指标 */
+.num-xl {
+  font-size: 34px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* 大金额 - 卡片主数字 */
+.num-lg {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+/* 中金额 - 列表/详情主数字 */
+.num-md {
+  font-size: 17px;
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+}
+
+/* 小数字 - 辅助信息 */
+.num-sm {
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  line-height: 1.4;
+}
+
+/* 极小数字 - 标签/百分比 */
+.num-xs {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* 涨跌颜色 - 低饱和更有质感 */
+.text-gain { color: #dc2626; }  /* 涨 - 深红 */
+.text-loss { color: #16a34a; }  /* 跌 - 深绿 */
+.text-brand { color: #0071e3; } /* 品牌蓝 */
+.text-muted { color: #94a3b8; } /* 弱化文字 */
+
+/* 标签文字 */
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.01em;
+}
+
+/* 标题文字 */
+h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -0.01em; color: #0f172a; font-weight: 600; }
+h1 { font-size: 24px; font-weight: 700; }
+h2 { font-size: 18px; font-weight: 600; }
+h3 { font-size: 15px; font-weight: 600; }
+
+::selection { background: rgba(0, 113, 227, 0.15); }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }
@@ -74,6 +230,167 @@ input, textarea, select, [contenteditable="true"] {
   -webkit-user-select: text;
 }
 
+
+/* ===== 水滴状立体按钮系统 ===== */
+.btn-primary {
+  position: relative;
+  background: linear-gradient(145deg, #4da3ff 0%, #0a84ff 30%, #0071e3 60%, #005bb5 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  font-weight: 600;
+  box-shadow: 
+    0 6px 20px rgba(0, 113, 227, 0.35),
+    0 2px 6px rgba(0, 113, 227, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 16px 16px 0 0;
+  pointer-events: none;
+}
+
+.btn-primary:hover {
+  box-shadow: 
+    0 8px 28px rgba(0, 113, 227, 0.45),
+    0 3px 8px rgba(0, 113, 227, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.45),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  box-shadow: 
+    0 3px 10px rgba(0, 113, 227, 0.3),
+    0 1px 3px rgba(0, 113, 227, 0.15),
+    inset 0 2px 4px rgba(0, 0, 0, 0.18),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(0);
+}
+
+.btn-glass {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.75) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  color: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  font-weight: 500;
+  box-shadow: 
+    0 4px 16px rgba(15, 23, 42, 0.08),
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 3px rgba(15, 23, 42, 0.05);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.btn-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 16px 16px 0 0;
+  pointer-events: none;
+}
+
+.btn-glass:hover {
+  background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.8) 100%);
+  box-shadow: 
+    0 6px 20px rgba(15, 23, 42, 0.1),
+    0 2px 5px rgba(15, 23, 42, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 3px rgba(15, 23, 42, 0.05);
+  transform: translateY(-1px);
+}
+
+.btn-glass:active {
+  box-shadow: 
+    0 2px 8px rgba(15, 23, 42, 0.06),
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    inset 0 2px 4px rgba(15, 23, 42, 0.08),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.5);
+  transform: translateY(0);
+}
+
+/* 中央悬浮按钮 - 水滴状强立体感 */
+.fab-button {
+  position: relative;
+  background: radial-gradient(circle at 35% 25%, #7cc4ff 0%, #3b9eff 15%, #0a84ff 35%, #0066cc 60%, #004a99 85%, #003366 100%);
+  color: white;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  box-shadow: 
+    0 12px 36px rgba(0, 102, 204, 0.5),
+    0 5px 14px rgba(0, 102, 204, 0.35),
+    0 2px 5px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.5),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.fab-button::before {
+  content: '';
+  position: absolute;
+  top: 6%;
+  left: 12%;
+  width: 76%;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.2) 40%, rgba(255,255,255,0) 100%);
+  border-radius: 50% 50% 45% 45%;
+  pointer-events: none;
+}
+
+.fab-button::after {
+  content: '';
+  position: absolute;
+  top: 12%;
+  left: 18%;
+  width: 22%;
+  height: 18%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 50%, transparent 75%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(0.5px);
+}
+
+.fab-button:hover {
+  box-shadow: 
+    0 16px 44px rgba(0, 102, 204, 0.6),
+    0 7px 18px rgba(0, 102, 204, 0.4),
+    0 3px 7px rgba(0, 0, 0, 0.18),
+    inset 0 2px 3px rgba(255, 255, 255, 0.55),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px) scale(1.08);
+}
+
+.fab-button:active {
+  box-shadow: 
+    0 6px 18px rgba(0, 102, 204, 0.45),
+    0 2px 6px rgba(0, 102, 204, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    inset 0 3px 8px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  transform: translateY(0) scale(0.95);
+}
 
 /* 交互与动效优化 */
 * { -webkit-tap-highlight-color: transparent; }

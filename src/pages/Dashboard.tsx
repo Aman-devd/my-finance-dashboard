@@ -217,9 +217,9 @@ export default function Dashboard() {
 function MiniStat({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone: 'up' | 'down' | 'gain' | 'loss' | 'flat' }) {
   return (
     <Card className="p-4">
-      <div className="text-xs text-slate-400">{label}</div>
-      <div className={cx('text-xl md:text-[22px] font-bold num mt-1', tone === 'gain' ? 'text-red-400' : tone === 'loss' ? 'text-emerald-400' : tone === 'up' ? 'text-emerald-400' : tone === 'down' ? 'text-red-400' : 'text-white')}>{value}</div>
-      {sub && <div className="text-[10px] text-slate-400 mt-0.5 truncate">{sub}</div>}
+      <div className="label">{label}</div>
+      <div className={cx('num-lg mt-1.5', tone === 'gain' ? 'text-gain' : tone === 'loss' ? 'text-loss' : tone === 'up' ? 'text-loss' : tone === 'down' ? 'text-gain' : 'text-slate-800')}>{value}</div>
+      {sub && <div className="num-xs mt-1 truncate">{sub}</div>}
     </Card>
   )
 }
@@ -227,10 +227,10 @@ function MiniStat({ label, value, sub, tone }: { label: string; value: string; s
 function MiniQuote({ name, price, pct, sub }: { name: string; price: number; pct: number; sub?: string }) {
   const up = pct >= 0
   return (
-    <div className="rounded-2xl bg-white/5 border border-white/10 p-3 backdrop-blur-sm">
-      <div className="text-[11px] text-slate-500 truncate">{name}{sub && <span className="text-slate-300"> {sub}</span>}</div>
-      <div className="text-[13px] font-bold num mt-0.5">{price.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</div>
-      <div className={cx('text-[11px] num font-medium flex items-center gap-0.5', up ? 'text-red-500' : 'text-emerald-600')}>
+    <div className="rounded-2xl bg-white/50 backdrop-blur-md border border-white/60 p-3 shadow-sm">
+      <div className="label truncate">{name}{sub && <span className="text-muted"> {sub}</span>}</div>
+      <div className="num-md mt-1">{price.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</div>
+      <div className={cx('num-xs flex items-center gap-0.5 mt-0.5', up ? 'text-gain' : 'text-loss')}>
         {up ? <TrendingUp size={11} /> : <TrendingDown size={11} />}{pct >= 0 ? '+' : ''}{pct.toFixed(2)}%
       </div>
     </div>

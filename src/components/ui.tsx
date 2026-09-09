@@ -16,8 +16,8 @@ export function Card({ className, children, onClick, style }: { className?: stri
 
 export function SectionTitle({ children, right }: { children: React.ReactNode; right?: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-2.5 mt-7 first:mt-0">
-      <h3 className="text-[13px] font-semibold tracking-[0.08em] text-slate-500">{children}</h3>
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-3 mt-6 first:mt-0">
+      <h3 className="text-[14px] font-semibold tracking-tight text-slate-700">{children}</h3>
       {right && <div className="shrink-0">{right}</div>}
     </div>
   )

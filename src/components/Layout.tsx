@@ -100,9 +100,9 @@ export default function Layout() {
   }, [])
 
   const NavLinkCls = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive ? 'bg-[#0071e3]/20 text-[#60a5fa] font-semibold shadow-[0_1px_2px_rgba(0,113,227,0.15)]' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`
+    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold shadow-[0_1px_2px_rgba(0,113,227,0.1)]' : 'text-slate-700 hover:bg-white/60 hover:text-slate-900'}`
   const darkNavCls = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive ? 'bg-[#0071e3]/20 text-[#60a5fa] font-semibold shadow-[0_1px_2px_rgba(0,113,227,0.15)]' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`
+    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold shadow-[0_1px_2px_rgba(0,113,227,0.1)]' : 'text-slate-700 hover:bg-white/60 hover:text-slate-900'}`
 
   return (
     <div className="min-h-full">
@@ -130,21 +130,30 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
-        <div className="mt-3 px-3 pt-4 border-t border-slate-100">
-          <div className="flex items-center gap-2">
-            <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0071e3] to-[#005bb5] text-white grid place-items-center text-sm font-bold uppercase shrink-0 shadow-sm">{user?.username?.slice(0, 1)}</span>
+        <div className="mt-2 px-3 pt-3">
+          <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-white/40 border border-white/50">
+            <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#0a84ff] to-[#005bb5] text-white grid place-items-center text-[15px] font-bold uppercase shrink-0 shadow-md">{user?.username?.slice(0, 1)}</span>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-semibold text-slate-800 truncate">{user?.username}</div>
-              <div className="text-[10px] text-slate-400 truncate">{user?.email || '本地演示账号'}</div>
+              <div className="text-[13px] font-semibold text-slate-800 truncate leading-tight">{user?.username}</div>
+              <div className="text-[11px] text-slate-500 truncate mt-0.5 leading-tight">{user?.email || '本地演示账号'}</div>
             </div>
-            <button onClick={() => { if (window.confirm('确定退出登录吗？')) logout() }} className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-red-500 transition-colors" title="退出登录"><LogOut size={15} /></button>
+            <button onClick={() => { if (window.confirm('确定退出登录吗？')) logout() }} className="p-2 rounded-xl text-slate-400 hover:bg-white/60 hover:text-red-500 transition-all" title="退出登录"><LogOut size={16} /></button>
           </div>
-          <div className="text-[10px] text-slate-400 mt-2 leading-4">v3.2 · 云端自动同步</div>
+          <div className="flex items-center gap-1.5 mt-2.5 px-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] text-slate-500 font-medium">v3.2 · 云端自动同步</span>
+          </div>
         </div>
       </aside>
 
       {/* 手机顶栏 */}
-      <header className="md:hidden sticky top-0 z-40 glass px-4 py-3 flex items-center gap-3">
+      <header className="md:hidden sticky top-2.5 z-40 mx-4 px-4 py-3 flex items-center gap-3 rounded-[22px]" style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.72) 50%, rgba(255,255,255,0.78) 100%)',
+        backdropFilter: 'blur(40px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(200%)',
+        border: '1px solid rgba(255,255,255,0.85)',
+        boxShadow: '0 8px 28px rgba(15,23,42,0.12), 0 3px 8px rgba(15,23,42,0.06), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 1px rgba(255,255,255,0.5), inset 0 0 20px rgba(255,255,255,0.1)'
+      }}>
         <button onClick={() => setOpen(true)} className="p-1 -ml-1 text-slate-600 hover:text-slate-900 transition-colors"><Menu size={22} /></button>
         <div className="flex-1 min-w-0 font-bold text-[17px] truncate tracking-tight">{title}</div>
         <NavLink to="/reminders" className="relative p-1 text-slate-500 hover:text-slate-900 transition-colors"><Bell size={20} /></NavLink>
@@ -182,21 +191,27 @@ export default function Layout() {
       </main>
 
       {/* 手机底部导航 */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass-strong">
+      <nav className="md:hidden fixed bottom-2.5 inset-x-4 z-40 rounded-[22px]" style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.75) 50%, rgba(255,255,255,0.8) 100%)',
+        backdropFilter: 'blur(40px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(200%)',
+        border: '1px solid rgba(255,255,255,0.85)',
+        boxShadow: '0 -8px 28px rgba(15,23,42,0.12), 0 -3px 8px rgba(15,23,42,0.06), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 1px rgba(255,255,255,0.5), inset 0 0 20px rgba(255,255,255,0.1)'
+      }}>
         <div className="grid grid-cols-5 h-[58px] pb-[env(safe-area-inset-bottom)] items-center">
           {MOBILE_BOTTOM.map((n) => {
             const active = n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)
             if (n.to === '/add') {
               return (
                 <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] text-[#0071e3] active:scale-100 touch-manipulation">
-                  <span className="w-11 h-11 -mt-5 rounded-full bg-gradient-to-br from-[#0071e3] to-[#005bb5] text-white grid place-items-center shadow-[0_4px_12px_rgba(0,113,227,0.4)]"><Plus size={21} /></span>
+                  <span className="fab-button w-11 h-11 -mt-4 rounded-full text-white grid place-items-center"><Plus size={20} strokeWidth={2.5} /></span>
                   <span className="font-medium -mt-0.5">记一笔</span>
                 </NavLink>
               )
             }
             return (
-              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] transition-colors duration-150 active:scale-100 touch-manipulation ${active ? 'text-[#60a5fa]' : 'text-slate-400'}`}>
-                <span className={`w-9 h-9 rounded-full grid place-items-center transition-colors duration-150 ${active ? 'bg-[#0071e3]/20' : ''}`}><n.icon size={19} strokeWidth={2} /></span>
+              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] transition-colors duration-150 active:scale-100 touch-manipulation ${active ? 'text-[#0071e3]' : 'text-slate-500'}`}>
+                <span className={`w-9 h-9 rounded-full grid place-items-center transition-colors duration-150 ${active ? 'bg-[#0071e3]/10' : ''}`}><n.icon size={19} strokeWidth={2} /></span>
                 <span className={active ? 'font-semibold' : ''}>{n.label}</span>
               </NavLink>
             )
