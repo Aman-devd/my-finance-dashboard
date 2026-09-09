@@ -231,20 +231,20 @@ input, textarea, select, [contenteditable="true"] {
 }
 
 
-/* ===== 水滴状立体按钮系统 ===== */
+/* ===== 简洁柔和立体按钮系统 ===== */
 .btn-primary {
   position: relative;
-  background: linear-gradient(145deg, #4da3ff 0%, #0a84ff 30%, #0071e3 60%, #005bb5 100%);
+  background: linear-gradient(180deg, #5ba9ff 0%, #2b8cff 40%, #0a72e8 70%, #005bbf 100%);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
   font-weight: 600;
   box-shadow: 
-    0 6px 20px rgba(0, 113, 227, 0.35),
-    0 2px 6px rgba(0, 113, 227, 0.2),
+    0 4px 14px rgba(10, 114, 232, 0.35),
+    0 1px 3px rgba(10, 114, 232, 0.2),
     inset 0 1px 1px rgba(255, 255, 255, 0.4),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.12);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    inset 0 -1px 2px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
 
@@ -256,43 +256,43 @@ input, textarea, select, [contenteditable="true"] {
   right: 0;
   height: 50%;
   background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 100%);
-  border-radius: 16px 16px 0 0;
+  border-radius: 14px 14px 0 0;
   pointer-events: none;
 }
 
 .btn-primary:hover {
   box-shadow: 
-    0 8px 28px rgba(0, 113, 227, 0.45),
-    0 3px 8px rgba(0, 113, 227, 0.25),
+    0 6px 20px rgba(10, 114, 232, 0.45),
+    0 2px 5px rgba(10, 114, 232, 0.25),
     inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.12);
+    inset 0 -1px 2px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
 }
 
 .btn-primary:active {
   box-shadow: 
-    0 3px 10px rgba(0, 113, 227, 0.3),
-    0 1px 3px rgba(0, 113, 227, 0.15),
-    inset 0 2px 4px rgba(0, 0, 0, 0.18),
+    0 2px 8px rgba(10, 114, 232, 0.3),
+    0 1px 2px rgba(10, 114, 232, 0.15),
+    inset 0 1px 3px rgba(0, 0, 0, 0.18),
     inset 0 -1px 1px rgba(255, 255, 255, 0.15);
   transform: translateY(0);
 }
 
 .btn-glass {
   position: relative;
-  background: linear-gradient(145deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.75) 100%);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.65) 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   color: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 14px;
   font-weight: 500;
   box-shadow: 
-    0 4px 16px rgba(15, 23, 42, 0.08),
-    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 3px 12px rgba(15, 23, 42, 0.07),
+    0 1px 2px rgba(15, 23, 42, 0.03),
     inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    inset 0 -2px 3px rgba(15, 23, 42, 0.05);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    inset 0 -1px 2px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
 
@@ -303,93 +303,61 @@ input, textarea, select, [contenteditable="true"] {
   left: 0;
   right: 0;
   height: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
-  border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 14px 14px 0 0;
   pointer-events: none;
 }
 
 .btn-glass:hover {
-  background: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.8) 100%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
   box-shadow: 
-    0 6px 20px rgba(15, 23, 42, 0.1),
-    0 2px 5px rgba(15, 23, 42, 0.05),
+    0 5px 16px rgba(15, 23, 42, 0.09),
+    0 1px 3px rgba(15, 23, 42, 0.04),
     inset 0 1px 1px rgba(255, 255, 255, 0.95),
-    inset 0 -2px 3px rgba(15, 23, 42, 0.05);
+    inset 0 -1px 2px rgba(15, 23, 42, 0.04);
   transform: translateY(-1px);
 }
 
 .btn-glass:active {
   box-shadow: 
-    0 2px 8px rgba(15, 23, 42, 0.06),
-    0 1px 2px rgba(15, 23, 42, 0.03),
-    inset 0 2px 4px rgba(15, 23, 42, 0.08),
+    0 1px 5px rgba(15, 23, 42, 0.05),
+    0 1px 1px rgba(15, 23, 42, 0.02),
+    inset 0 1px 3px rgba(15, 23, 42, 0.07),
     inset 0 -1px 1px rgba(255, 255, 255, 0.5);
   transform: translateY(0);
 }
 
-/* 中央悬浮按钮 - 水滴状强立体感 */
+/* 中央悬浮按钮 - 简洁立体 */
 .fab-button {
   position: relative;
-  background: radial-gradient(circle at 35% 25%, #7cc4ff 0%, #3b9eff 15%, #0a84ff 35%, #0066cc 60%, #004a99 85%, #003366 100%);
+  background: linear-gradient(180deg, #4da3ff 0%, #0a84ff 50%, #0066cc 100%);
   color: white;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   box-shadow: 
-    0 12px 36px rgba(0, 102, 204, 0.5),
-    0 5px 14px rgba(0, 102, 204, 0.35),
-    0 2px 5px rgba(0, 0, 0, 0.15),
-    inset 0 2px 3px rgba(255, 255, 255, 0.5),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.25),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  overflow: hidden;
-}
-
-.fab-button::before {
-  content: '';
-  position: absolute;
-  top: 6%;
-  left: 12%;
-  width: 76%;
-  height: 45%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.2) 40%, rgba(255,255,255,0) 100%);
-  border-radius: 50% 50% 45% 45%;
-  pointer-events: none;
-}
-
-.fab-button::after {
-  content: '';
-  position: absolute;
-  top: 12%;
-  left: 18%;
-  width: 22%;
-  height: 18%;
-  background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 50%, transparent 75%);
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(0.5px);
+    0 6px 20px rgba(10, 132, 255, 0.4),
+    0 2px 6px rgba(10, 132, 255, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fab-button:hover {
   box-shadow: 
-    0 16px 44px rgba(0, 102, 204, 0.6),
-    0 7px 18px rgba(0, 102, 204, 0.4),
-    0 3px 7px rgba(0, 0, 0, 0.18),
-    inset 0 2px 3px rgba(255, 255, 255, 0.55),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.25),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
-  transform: translateY(-3px) scale(1.08);
+    0 10px 28px rgba(10, 132, 255, 0.5),
+    0 3px 8px rgba(10, 132, 255, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) scale(1.05);
 }
 
 .fab-button:active {
   box-shadow: 
-    0 6px 18px rgba(0, 102, 204, 0.45),
-    0 2px 6px rgba(0, 102, 204, 0.3),
-    0 1px 2px rgba(0, 0, 0, 0.12),
-    inset 0 3px 8px rgba(0, 0, 0, 0.3),
-    inset 0 -1px 2px rgba(255, 255, 255, 0.25),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  transform: translateY(0) scale(0.95);
+    0 3px 10px rgba(10, 132, 255, 0.35),
+    0 1px 3px rgba(10, 132, 255, 0.2),
+    inset 0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(0) scale(0.97);
 }
 
 /* 交互与动效优化 */
