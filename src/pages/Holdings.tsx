@@ -21,19 +21,21 @@ export default function Holdings() {
   const myHoldings = views.filter((v) => v.accountId === accId)
   const myTrades = data.trades.filter((t) => t.accountId === accId).sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30)
 
-  // ETF 走势 + 买卖点
+  // 走势 + 买卖点：根据用户第一个持仓动态显示
+  const firstHolding = myHoldings[0]
   const chart = useMemo(() => {
-    const meta = findMeta('sh513100')
+    if (!firstHolding) return null
+    const meta = createMetaFromCode(firstHolding.symbol, firstHolding.name)
     const k = klineSeries(meta, 90)
     const dates = k.map((x) => x.date)
     const closes = k.map((x) => x.close)
-    const opt = lineOption(dates, [{ name: meta.name, data: closes, color: '#2563eb' }], { yFmt: (v) => v.toFixed(3) }) as unknown as { series: { markPoint?: unknown }[] }
+    const opt = lineOption(dates, [{ name: firstHolding.name, data: closes, color: '#0071e3' }], { yFmt: (v) => v.toFixed(3) }) as unknown as { series: { markPoint?: unknown }[] }
     const points = myTrades
-      .filter((t) => dates.includes(t.date))
+      .filter((t) => t.symbol === firstHolding.symbol && dates.includes(t.date))
       .map((t) => ({ coord: [dates.indexOf(t.date), t.price], value: t.side === 'buy' ? '买' : '卖', itemStyle: { color: t.side === 'buy' ? '#dc2626' : '#16a34a' }, symbol: 'circle', symbolSize: 11, borderWidth: 2, borderColor: '#fff', label: { show: true, formatter: t.side === 'buy' ? '买' : '卖', color: t.side === 'buy' ? '#dc2626' : '#16a34a', fontSize: 9, position: 'right' as const, distance: 2 } }))
     if (opt.series && opt.series[0]) (opt.series[0] as { markPoint?: unknown }).markPoint = { data: points, symbolOffset: [0, -4] }
-    return { option: opt as never, dates, closes }
-  }, [myTrades, data])
+    return { option: opt as never, dates, closes, name: firstHolding.name }
+  }, [myTrades, data, firstHolding])
 
   const fm = (n: number) => n.toLocaleString('zh-CN', { minimumFractionDigits: 2 })
   const pct = (n: number) => (n >= 0 ? '+' : '') + n.toFixed(2) + '%'
@@ -82,7 +84,9 @@ export default function Holdings() {
               <span className="text-[10px] text-slate-400">{accStats.length} 个账户</span>
             </div>
             <div className="text-[11px] text-slate-400 mb-3">持仓成本 ¥{fm(totalCost)} · 市值 ¥{fm(totalMv)} · 盈亏 <span className={cx('font-medium', totalMv - totalCost >= 0 ? 'text-red-500' : 'text-emerald-600')}>¥{fm(totalMv - totalCost)}（{pct(totalCost ? ((totalMv - totalCost) / totalCost) * 100 : 0)}）</span></div>
-            {accStats.length === 0 ? <div className="text-xs text-slate-300 py-3">暂无持仓数据</div> : (
+            {accStats.length === 0 ? <div className="text-xs text-slate-300 py-3">暂无持仓数据</div> : totalMv <= 0 ? (
+              <div className="text-xs text-slate-400 py-6 text-center bg-slate-50/50 rounded-xl">暂无持仓，点击右上角「记录买卖」开始记录</div>
+            ) : (
               <>
                 <div className="grid sm:grid-cols-2 gap-3 mb-3">
                   {accStats.map((a) => {
@@ -147,14 +151,16 @@ export default function Holdings() {
         <span className="text-xs text-slate-400">切换到账户查看明细与买卖点</span>
       </div>
 
-      {/* 走势 + 买卖点 */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold">纳指100ETF 走势与买卖点</h3>
-          <span className="text-[10px] text-slate-300">近 90 个交易日</span>
-        </div>
-        <EChart option={chart.option} height={240} />
-      </Card>
+      {/* 走势 + 买卖点：只有当有持仓时才显示 */}
+      {chart && (
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold">{chart.name} 走势与买卖点</h3>
+            <span className="text-[10px] text-slate-300">近 90 个交易日</span>
+          </div>
+          <EChart option={chart.option} height={240} />
+        </Card>
+      )}
 
       <Card className="overflow-hidden">
         <div className="px-4 pt-4 pb-2 flex items-center justify-between">
