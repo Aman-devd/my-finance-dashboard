@@ -201,13 +201,13 @@ export default function Layout() {
         <div className="grid grid-cols-5 h-[72px] px-1.5 pb-[env(safe-area-inset-bottom)] items-center justify-items-center">
           {MOBILE_BOTTOM.map((n, idx) => {
             const active = n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)
-            // 每个图标的柔和渐变色
+            // 每个图标的超柔和渐变色（灰调，低饱和）
             const gradients = [
-              'linear-gradient(145deg, #8ab4e8 0%, #5a8fd0 60%, #4a7ab8 100%)', // 首页 柔和蓝
-              'linear-gradient(145deg, #8ed4b0 0%, #5fb88a 60%, #4fa078 100%)', // 行情 柔和绿
-              'linear-gradient(145deg, #7eb8f0 0%, #4a90e0 50%, #3a7bc8 100%)', // 记一笔 柔和亮蓝
-              'linear-gradient(145deg, #f0c080 0%, #e0a050 60%, #c88840 100%)', // 提醒 柔和橙
-              'linear-gradient(145deg, #b8b8bd 0%, #98989d 60%, #808085 100%)', // 我的 柔和灰
+              'linear-gradient(145deg, #a8c4e0 0%, #7a9cc0 60%, #6888a8 100%)', // 首页 超柔和蓝
+              'linear-gradient(145deg, #a8d4bc 0%, #7ab898 60%, #68a084 100%)', // 行情 超柔和绿
+              'linear-gradient(145deg, #9abce8 0%, #6a98d0 50%, #5884b8 100%)', // 记一笔 超柔和亮蓝
+              'linear-gradient(145deg, #e8c898 0%, #d0a870 60%, #b89058 100%)', // 提醒 超柔和橙
+              'linear-gradient(145deg, #c8c8cc 0%, #a8a8ac 60%, #909094 100%)', // 我的 超柔和灰
             ]
             const gradient = gradients[idx] || gradients[0]
             

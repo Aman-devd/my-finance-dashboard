@@ -68,7 +68,7 @@ export default function AddTransaction() {
       <Card className="p-5">
         <div className="grid grid-cols-4 gap-2">
           {TYPE_META.map((m) => (
-            <button key={m.v} onClick={() => { setType(m.v); setCategoryId(''); setToAccountId('') }} className={cx('flex flex-col items-center gap-1 py-2.5 rounded-2xl text-xs font-medium border transition', type === m.v ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-500')}>
+            <button key={m.v} onClick={() => { setType(m.v); setCategoryId(''); setToAccountId('') }} className={cx('flex flex-col items-center gap-1 py-2.5 rounded-2xl text-xs font-medium border backdrop-blur-md transition', type === m.v ? 'border-blue-400/60 bg-blue-500/20 text-blue-700' : 'border-white/50 bg-white/40 text-slate-500')}>
               <span className="text-base leading-none">{m.v === 'expense' ? <ArrowUpRight size={18} /> : m.v === 'income' ? <ArrowDownLeft size={18} /> : m.v === 'transfer' ? <ArrowLeftRight size={18} /> : <HandCoins size={18} />}</span>
               <span>{m.label}</span>
             </button>
@@ -99,7 +99,7 @@ export default function AddTransaction() {
           <div className="text-xs font-semibold text-slate-500 mb-2">分类</div>
           <div className="grid grid-cols-4 gap-2">
             {cats.map((c) => (
-              <button key={c.id} onClick={() => setCategoryId(c.id)} className={cx('rounded-xl border p-2 text-center text-xs transition', categoryId === c.id ? 'border-transparent ring-2' : 'border-slate-100 bg-white text-slate-600')} style={categoryId === c.id ? { background: c.color + '14', color: c.color, ['--tw-ring-color' as string]: c.color } : undefined}>
+              <button key={c.id} onClick={() => setCategoryId(c.id)} className={cx('rounded-xl border p-2 text-center text-xs backdrop-blur-md transition', categoryId === c.id ? 'border-transparent ring-2' : 'border-white/50 bg-white/40 text-slate-600')} style={categoryId === c.id ? { background: c.color + '14', color: c.color, ['--tw-ring-color' as string]: c.color } : undefined}>
                 <span className="block w-6 h-6 mx-auto rounded-lg mb-1" style={{ background: c.color }} />
                 {c.name}
               </button>

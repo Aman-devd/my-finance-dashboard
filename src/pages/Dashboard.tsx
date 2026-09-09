@@ -239,7 +239,7 @@ function MiniQuote({ name, price, pct, sub }: { name: string; price: number; pct
 
 function QuickLink({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
   return (
-    <Link to={to} className="bg-white rounded-xl border border-slate-200/80 p-4 flex flex-col items-center gap-2 text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">
+    <Link to={to} className="bg-white/40 backdrop-blur-md rounded-xl border border-white/50 p-4 flex flex-col items-center gap-2 text-slate-600 transition hover:border-white/70 hover:bg-white/50 shadow-sm">
       <span className="text-blue-600">{icon}</span>
       <span className="text-xs font-medium">{label}</span>
     </Link>
@@ -248,7 +248,7 @@ function QuickLink({ to, icon, label }: { to: string; icon: React.ReactNode; lab
 
 function QuickBtn({ onClick, icon, label }: { onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
-    <button onClick={onClick} className="bg-white rounded-xl border border-slate-200/80 p-4 flex flex-col items-center gap-2 text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">
+    <button onClick={onClick} className="bg-white/40 backdrop-blur-md rounded-xl border border-white/50 p-4 flex flex-col items-center gap-2 text-slate-600 transition hover:border-white/70 hover:bg-white/50 shadow-sm">
       <span className="text-blue-600">{icon}</span>
       <span className="text-xs font-medium">{label}</span>
     </button>

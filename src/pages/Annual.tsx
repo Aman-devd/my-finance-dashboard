@@ -70,9 +70,9 @@ export default function Annual() {
         sub={`${year} 年 · 全年收支 · 人情往来 · 车辆开销`}
         right={
           <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-            <button disabled={year <= years.min} onClick={() => setYear((y) => y - 1)} className="w-8 h-8 grid place-items-center rounded-lg bg-white shadow-sm text-slate-600 disabled:opacity-30"><ChevronLeft size={16} /></button>
+            <button disabled={year <= years.min} onClick={() => setYear((y) => y - 1)} className="w-8 h-8 grid place-items-center rounded-lg bg-white/40 backdrop-blur-md border border-white/50 shadow-sm text-slate-600 disabled:opacity-30"><ChevronLeft size={16} /></button>
             <span className="px-2 text-sm font-semibold num min-w-[64px] text-center">{year}</span>
-            <button disabled={year >= years.max} onClick={() => setYear((y) => y + 1)} className="w-8 h-8 grid place-items-center rounded-lg bg-white shadow-sm text-slate-600 disabled:opacity-30"><ChevronRight size={16} /></button>
+            <button disabled={year >= years.max} onClick={() => setYear((y) => y + 1)} className="w-8 h-8 grid place-items-center rounded-lg bg-white/40 backdrop-blur-md border border-white/50 shadow-sm text-slate-600 disabled:opacity-30"><ChevronRight size={16} /></button>
           </div>
         }
       />
