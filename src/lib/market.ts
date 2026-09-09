@@ -131,21 +131,47 @@ export function intradaySeries(meta: MarketMeta, date = dayjs()): IntradayResult
     return { rows: out, date: today, source: 'flat' }
   }
 
-  // 完全无数据时的演示曲线（从最新价出发随机游走）
+  // 完全无数据时的演示曲线（基于上一交易日真实日K生成，更真实）
   const latest = quoteOf(meta, date)
   const seed = hash(date.format('YYYY-MM-DD') + '|' + meta.symbol)
-  const drift = (rand01(seed + 37) - 0.5) * 0.025
-  let p = latest.price
+  // 尝试获取上一交易日的真实日K数据，用于生成更真实的模拟分时图
+  const klineReal = getKlineRows(tencentCodeOf(meta))
+  let openP = latest.price * 0.998
+  let closeP = latest.price
+  let highP = latest.price * 1.005
+  let lowP = latest.price * 0.995
+  if (klineReal && klineReal.length >= 2) {
+    // 使用上一交易日（倒数第二个，因为最后一个可能是今天未完成的）的日K数据
+    const lastK = klineReal[klineReal.length - 2]
+    openP = lastK.open
+    closeP = lastK.close
+    highP = lastK.high
+    lowP = lastK.low
+  }
+  const drift = (closeP - openP) / openP
+  let p = openP
   const out: { t: string; price: number; volume: number }[] = []
   const step = meta.exchange === 'CN' ? 2 : 5 // 分钟步长
+  const totalSteps = 390 / step
   for (let i = 0; i < 390; i += step) {
-    p = p * (1 + drift / 390 * step + (rand01(seed + 41 + i) - 0.5) * 0.0022)
+    const progress = i / 390
+    // 基于日K的高低点生成模拟走势：开盘→随机波动→收盘
+    // 加入日内波动，让走势更真实
+    const targetVol = (highP - lowP) / lowP * 0.6
+    const randomShock = (rand01(seed + 41 + i) - 0.5) * targetVol / totalSteps
+    // 趋势项：从开盘到收盘的线性趋势
+    const trend = drift / totalSteps * step
+    p = p * (1 + trend + randomShock)
+    // 限制价格在高低点范围内
+    p = Math.max(lowP * 0.998, Math.min(highP * 1.002, p))
     const hh = Math.floor((meta.session[0] * 60 + i) / 60)
     const mm = ((meta.session[0] * 60 + i) % 60)
     const t = `${String(hh % 24).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
     const vol = Math.round(1000 + rand01(seed + 51 + i) * 5000)
     out.push({ t, price: +p.toFixed(meta.decimals), volume: vol })
   }
+  // 确保最后一个点是收盘价
+  if (out.length) out[out.length - 1].price = +closeP.toFixed(meta.decimals)
   return { rows: out, date: today, source: 'demo' }
 }
 
