@@ -85,20 +85,38 @@ export default function Holdings() {
             {accStats.length === 0 ? <div className="text-xs text-slate-300 py-3">暂无持仓数据</div> : (
               <>
                 <div className="grid sm:grid-cols-2 gap-3 mb-3">
-                  {accStats.map((a) => (
-                    <div key={a.name} className="rounded-xl p-3 border border-slate-200/60" style={{ background: `linear-gradient(135deg, ${a.color}08 0%, ${a.color}03 100%)` }}>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: a.color }}></span>
-                        <span className="text-xs font-medium text-slate-700 truncate">{a.name}</span>
-                        <span className="text-[10px] text-slate-400 shrink-0">{a.count} 只</span>
+                  {accStats.map((a) => {
+                    const accId = secAccounts.find((x) => x.name === a.name)?.id
+                    return (
+                      <div key={a.name} className="rounded-xl p-3 border border-slate-200/60 relative group" style={{ background: `linear-gradient(135deg, ${a.color}08 0%, ${a.color}03 100%)` }}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: a.color }}></span>
+                          <button onClick={() => accId && setAccId(accId)} className="text-xs font-medium text-slate-700 truncate hover:text-[#0071e3] transition-colors text-left">{a.name}</button>
+                          <span className="text-[10px] text-slate-400 shrink-0">{a.count} 只</span>
+                          {a.count > 0 && accId && (
+                            <button
+                              onClick={() => {
+                                const hs = views.filter((v) => v.accountId === accId)
+                                if (hs.length === 0) return
+                                if (confirm(`确定删除「${a.name}」的全部 ${hs.length} 只持仓和交易记录吗？此操作不可撤销。`)) {
+                                  hs.forEach((h) => deleteHolding(accId, h.symbol))
+                                }
+                              }}
+                              className="opacity-0 group-hover:opacity-100 ml-auto w-6 h-6 rounded-md grid place-items-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all shrink-0"
+                              title="删除该账户全部持仓"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex justify-between items-end">
+                          <span className="num font-bold text-lg text-slate-900">{fm(a.mv)}</span>
+                          <span className={cx('num text-xs font-semibold', a.pnl >= 0 ? 'text-red-500' : 'text-emerald-600')}>{a.pnl >= 0 ? '+' : ''}{fm(a.pnl)}（{pct(a.pnlPct)}）</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 num mt-1">成本 ¥{fm(a.cost)} · 可用 ¥{fm(a.cash)}</div>
                       </div>
-                      <div className="flex justify-between items-end">
-                        <span className="num font-bold text-lg text-slate-900">{fm(a.mv)}</span>
-                        <span className={cx('num text-xs font-semibold', a.pnl >= 0 ? 'text-red-500' : 'text-emerald-600')}>{a.pnl >= 0 ? '+' : ''}{fm(a.pnl)}（{pct(a.pnlPct)}）</span>
-                      </div>
-                      <div className="text-[10px] text-slate-400 num mt-1">成本 ¥{fm(a.cost)} · 可用 ¥{fm(a.cash)}</div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
