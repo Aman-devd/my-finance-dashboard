@@ -61,7 +61,14 @@ function parse(text: string) {
 export async function refreshQuotes(): Promise<void> {
   try {
     const r = await fetch(URL, { cache: 'no-store' })
-    parse(await r.text())
+    const buffer = await r.arrayBuffer()
+    let text: string
+    try {
+      text = new TextDecoder('gbk').decode(buffer)
+    } catch {
+      text = new TextDecoder('utf-8').decode(buffer)
+    }
+    parse(text)
   } catch { /* 网络异常静默，下一轮自动重试 */ }
 }
 
@@ -83,7 +90,14 @@ export async function fetchQuoteByCode(code: string): Promise<{ quote: LiveQuote
   try {
     const url = 'https://qt.gtimg.cn/q=' + code
     const r = await fetch(url, { cache: 'no-store' })
-    const text = await r.text()
+    // 腾讯财经接口返回 GBK 编码，需要用 TextDecoder 解码
+    const buffer = await r.arrayBuffer()
+    let text: string
+    try {
+      text = new TextDecoder('gbk').decode(buffer)
+    } catch {
+      text = new TextDecoder('utf-8').decode(buffer)
+    }
     const re = /v_(\w+)="([^"]*)"/g
     const m = re.exec(text)
     if (!m) return null
