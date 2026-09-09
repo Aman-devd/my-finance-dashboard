@@ -190,7 +190,7 @@ export default function Layout() {
         </div>
       </main>
 
-      {/* 手机底部导航 - iOS Dock 风格 */}
+      {/* 手机底部导航 - iOS Dock 风格 胶囊状柔和色 */}
       <nav className="md:hidden fixed bottom-2.5 inset-x-4 z-40 rounded-[26px] overflow-hidden" style={{
         background: 'linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.45) 100%)',
         backdropFilter: 'blur(30px) saturate(200%)',
@@ -198,37 +198,37 @@ export default function Layout() {
         border: '1.5px solid rgba(255,255,255,0.6)',
         boxShadow: '0 -8px 32px rgba(15,23,42,0.12), 0 -3px 10px rgba(15,23,42,0.06), 0 0 30px rgba(255,255,255,0.25), inset 0 1.5px 2px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(15,23,42,0.05)'
       }}>
-        <div className="grid grid-cols-5 h-[72px] px-2 pb-[env(safe-area-inset-bottom)] items-center justify-items-center">
+        <div className="grid grid-cols-5 h-[72px] px-1.5 pb-[env(safe-area-inset-bottom)] items-center justify-items-center">
           {MOBILE_BOTTOM.map((n, idx) => {
             const active = n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)
-            // 每个图标的渐变色
+            // 每个图标的柔和渐变色
             const gradients = [
-              'linear-gradient(145deg, #5ba9ff 0%, #0a72e8 60%, #005bbf 100%)', // 首页 蓝
-              'linear-gradient(145deg, #5bd9a0 0%, #28b970 60%, #1a9e5c 100%)', // 行情 绿
-              'linear-gradient(145deg, #66b1ff 0%, #0a84ff 50%, #0066cc 100%)', // 记一笔 亮蓝
-              'linear-gradient(145deg, #ffb340 0%, #ff9500 60%, #e07e00 100%)', // 提醒 橙
-              'linear-gradient(145deg, #a8a8ad 0%, #8e8e93 60%, #6e6e73 100%)', // 我的 灰
+              'linear-gradient(145deg, #8ab4e8 0%, #5a8fd0 60%, #4a7ab8 100%)', // 首页 柔和蓝
+              'linear-gradient(145deg, #8ed4b0 0%, #5fb88a 60%, #4fa078 100%)', // 行情 柔和绿
+              'linear-gradient(145deg, #7eb8f0 0%, #4a90e0 50%, #3a7bc8 100%)', // 记一笔 柔和亮蓝
+              'linear-gradient(145deg, #f0c080 0%, #e0a050 60%, #c88840 100%)', // 提醒 柔和橙
+              'linear-gradient(145deg, #b8b8bd 0%, #98989d 60%, #808085 100%)', // 我的 柔和灰
             ]
             const gradient = gradients[idx] || gradients[0]
             
             if (n.to === '/add') {
               return (
                 <NavLink key={n.to} to="/add" className="flex flex-col items-center gap-1 active:scale-90 transition-transform touch-manipulation">
-                  <span className="w-11 h-11 rounded-[14px] grid place-items-center text-white relative overflow-hidden" style={{ background: gradient, boxShadow: '0 4px 12px rgba(10,114,232,0.4), 0 1px 3px rgba(10,114,232,0.25), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.15)' }}>
-                    <span className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-[14px]" />
-                    <Plus size={22} strokeWidth={2.5} className="relative z-10" />
+                  <span className="w-14 h-10 rounded-full grid place-items-center text-white relative overflow-hidden" style={{ background: gradient, boxShadow: '0 3px 10px rgba(74,123,184,0.35), 0 1px 2px rgba(74,123,184,0.2), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.12)' }}>
+                    <span className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-full" />
+                    <Plus size={20} strokeWidth={2.5} className="relative z-10" />
                   </span>
-                  <span className="text-[9px] font-medium text-[#0071e3]">记一笔</span>
+                  <span className="text-[9px] font-medium text-[#4a7ab8]">记一笔</span>
                 </NavLink>
               )
             }
             return (
               <NavLink key={n.to} to={n.to} className={`flex flex-col items-center gap-1 active:scale-90 transition-transform touch-manipulation ${active ? '' : 'opacity-70'}`}>
-                <span className="w-11 h-11 rounded-[14px] grid place-items-center text-white relative overflow-hidden" style={{ background: gradient, boxShadow: active ? '0 4px 12px rgba(10,114,232,0.35), 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.15)' : '0 2px 6px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -2px 3px rgba(0,0,0,0.12)' }}>
-                  <span className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-[14px]" />
-                  <n.icon size={20} strokeWidth={2} className="relative z-10" />
+                <span className="w-14 h-10 rounded-full grid place-items-center text-white relative overflow-hidden" style={{ background: gradient, boxShadow: active ? '0 3px 10px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.4), inset 0 -2px 3px rgba(0,0,0,0.12)' : '0 2px 5px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -2px 3px rgba(0,0,0,0.1)' }}>
+                  <span className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-full" />
+                  <n.icon size={18} strokeWidth={2} className="relative z-10" />
                 </span>
-                <span className={`text-[9px] ${active ? 'font-semibold text-slate-800' : 'font-medium text-slate-500'}`}>{n.label}</span>
+                <span className={`text-[9px] ${active ? 'font-semibold text-slate-700' : 'font-medium text-slate-500'}`}>{n.label}</span>
               </NavLink>
             )
           })}
