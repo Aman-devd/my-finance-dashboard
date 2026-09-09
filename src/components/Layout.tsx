@@ -100,9 +100,9 @@ export default function Layout() {
   }, [])
 
   const NavLinkCls = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold shadow-[0_1px_2px_rgba(0,113,227,0.08)]' : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'}`
+    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive ? 'bg-[#0071e3]/20 text-[#60a5fa] font-semibold shadow-[0_1px_2px_rgba(0,113,227,0.15)]' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`
   const darkNavCls = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold shadow-[0_1px_2px_rgba(0,113,227,0.08)]' : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'}`
+    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${isActive ? 'bg-[#0071e3]/20 text-[#60a5fa] font-semibold shadow-[0_1px_2px_rgba(0,113,227,0.15)]' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`
 
   return (
     <div className="min-h-full">
@@ -115,7 +115,7 @@ export default function Layout() {
         </div>
       )}
       {/* 桌面侧边栏 */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col bg-white/70 backdrop-blur-xl border-r border-slate-200/50 px-3 py-5">
+      <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col glass-strong px-3 py-5">
         <div className="flex items-center gap-2.5 px-3 mb-7">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0071e3] to-[#005bb5] text-white grid place-items-center shadow-[0_2px_8px_rgba(0,113,227,0.3)]"><Coins size={20} /></div>
           <div>
@@ -144,7 +144,7 @@ export default function Layout() {
       </aside>
 
       {/* 手机顶栏 */}
-      <header className="md:hidden sticky top-0 z-40 bg-white/75 backdrop-blur-xl border-b border-slate-200/50 flex items-center gap-3 px-4 py-3">
+      <header className="md:hidden sticky top-0 z-40 glass px-4 py-3 flex items-center gap-3">
         <button onClick={() => setOpen(true)} className="p-1 -ml-1 text-slate-600 hover:text-slate-900 transition-colors"><Menu size={22} /></button>
         <div className="flex-1 min-w-0 font-bold text-[17px] truncate tracking-tight">{title}</div>
         <NavLink to="/reminders" className="relative p-1 text-slate-500 hover:text-slate-900 transition-colors"><Bell size={20} /></NavLink>
@@ -182,7 +182,7 @@ export default function Layout() {
       </main>
 
       {/* 手机底部导航 */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/80 backdrop-blur-xl border-t border-slate-200/50 shadow-[0_-8px_24px_-12px_rgba(15,23,42,0.15)]">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass-strong">
         <div className="grid grid-cols-5 h-[58px] pb-[env(safe-area-inset-bottom)] items-center">
           {MOBILE_BOTTOM.map((n) => {
             const active = n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)
@@ -195,8 +195,8 @@ export default function Layout() {
               )
             }
             return (
-              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] transition-colors duration-150 active:scale-100 touch-manipulation ${active ? 'text-[#0071e3]' : 'text-slate-400'}`}>
-                <span className={`w-9 h-9 rounded-full grid place-items-center transition-colors duration-150 ${active ? 'bg-[#0071e3]/10' : ''}`}><n.icon size={19} strokeWidth={2} /></span>
+              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] transition-colors duration-150 active:scale-100 touch-manipulation ${active ? 'text-[#60a5fa]' : 'text-slate-400'}`}>
+                <span className={`w-9 h-9 rounded-full grid place-items-center transition-colors duration-150 ${active ? 'bg-[#0071e3]/20' : ''}`}><n.icon size={19} strokeWidth={2} /></span>
                 <span className={active ? 'font-semibold' : ''}>{n.label}</span>
               </NavLink>
             )

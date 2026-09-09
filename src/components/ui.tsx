@@ -8,7 +8,7 @@ export function cx(...cls: (string | false | null | undefined)[]) {
 export function Card({ className, children, onClick, style }: { className?: string; children: React.ReactNode; onClick?: () => void; style?: React.CSSProperties }) {
   const hasBg = typeof className === 'string' && /(^|\s)bg-/.test(className)
   return (
-    <div onClick={onClick} style={style} className={cx(!hasBg && 'bg-white', 'rounded-2xl border border-slate-200/60 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_1px_2px_rgba(15,23,42,0.03)]', onClick && 'cursor-pointer transition-all duration-200 hover:shadow-[0_8px_24px_-12px_rgba(15,23,42,0.15)] hover:border-slate-300/60 active:opacity-90 active:scale-[0.995]', className)}>
+    <div onClick={onClick} style={style} className={cx(!hasBg && 'glass-card', 'rounded-3xl', onClick && 'cursor-pointer transition-all duration-200 hover:bg-white/10 hover:border-white/20 active:opacity-90 active:scale-[0.995]', className)}>
       {children}
     </div>
   )
