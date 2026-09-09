@@ -4,7 +4,7 @@ import { moneyShort } from '../lib/format'
 import { useApp } from '../lib/store'
 import { investmentView, investmentTotals } from '../lib/values'
 import { findMeta, quoteOf, klineSeries, createMetaFromCode } from '../lib/market'
-import { fetchQuoteByCode, getLiveQuote } from '../lib/quotes'
+import { fetchQuoteByCode, getLiveQuote, addQuoteSymbol } from '../lib/quotes'
 import { Button, Card, DateInput, Empty, Field, Modal, PageHead, Select, Segmented, Tag, TextInput, cx } from '../components/ui'
 import { EChart, lineOption, barOption, pieOption } from '../components/charts'
 import { Plus, TrendingUp, TrendingDown, Trash2, Search, Loader2, Pencil } from 'lucide-react'
@@ -15,22 +15,16 @@ export default function Holdings() {
   const secAccounts = data.accounts.filter((a) => a.category === 'securities')
   const [accId, setAccId] = useState(secAccounts[0]?.id || '')
   const [open, setOpen] = useState(false)
-  const [, forceUpdate] = useState(0)
 
   const views = useMemo(() => investmentView(data), [data])
   const totals = useMemo(() => investmentTotals(data), [data])
   const myHoldings = views.filter((v) => v.accountId === accId)
   const myTrades = data.trades.filter((t) => t.accountId === accId).sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30)
 
-  // 页面加载时自动查询所有持仓标的的行情（解决sz159941等非默认标的获取不到行情的问题）
+  // 页面加载时把用户持仓的标的添加到行情轮询列表（解决sz159941等非默认标的获取不到行情的问题）
   useEffect(() => {
     const allSymbols = [...new Set(data.holdings.filter((h) => h.shares > 0).map((h) => h.symbol))]
-    allSymbols.forEach((symbol) => {
-      // 缓存中没有的才查询
-      if (!getLiveQuote(symbol)) {
-        void fetchQuoteByCode(symbol).then(() => forceUpdate((n) => n + 1))
-      }
-    })
+    allSymbols.forEach((symbol) => addQuoteSymbol(symbol))
   }, [data.holdings])
 
   // 走势 + 买卖点：根据用户第一个持仓动态显示

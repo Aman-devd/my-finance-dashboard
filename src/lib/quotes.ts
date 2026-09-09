@@ -15,12 +15,21 @@ export interface LiveQuote {
   time: string
 }
 
-const CODES = ['usNDX', 'usIXIC', 'usINX', 'usDJI', 'sh513100']
-const URL = 'https://qt.gtimg.cn/q=' + CODES.join(',')
+const CODES = new Set(['usNDX', 'usIXIC', 'usINX', 'usDJI', 'sh513100'])
+function buildUrl() { return 'https://qt.gtimg.cn/q=' + [...CODES].join(',') }
 
 const cache = new Map<string, LiveQuote>()
 let started = false
 const subs = new Set<() => void>()
+
+/** 动态添加标的到行情轮询列表（用于用户持仓的非默认标的） */
+export function addQuoteSymbol(code: string): void {
+  if (!CODES.has(code)) {
+    CODES.add(code)
+    // 立即刷新一次行情
+    void refreshQuotes()
+  }
+}
 
 function notify() {
   for (const fn of [...subs]) { try { fn() } catch { /* ignore */ } }
@@ -60,7 +69,7 @@ function parse(text: string) {
 
 export async function refreshQuotes(): Promise<void> {
   try {
-    const r = await fetch(URL, { cache: 'no-store' })
+    const r = await fetch(buildUrl(), { cache: 'no-store' })
     const buffer = await r.arrayBuffer()
     let text: string
     try {
