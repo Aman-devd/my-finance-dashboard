@@ -15,11 +15,23 @@ export default function Holdings() {
   const secAccounts = data.accounts.filter((a) => a.category === 'securities')
   const [accId, setAccId] = useState(secAccounts[0]?.id || '')
   const [open, setOpen] = useState(false)
+  const [, forceUpdate] = useState(0)
 
   const views = useMemo(() => investmentView(data), [data])
   const totals = useMemo(() => investmentTotals(data), [data])
   const myHoldings = views.filter((v) => v.accountId === accId)
   const myTrades = data.trades.filter((t) => t.accountId === accId).sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30)
+
+  // 页面加载时自动查询所有持仓标的的行情（解决sz159941等非默认标的获取不到行情的问题）
+  useEffect(() => {
+    const allSymbols = [...new Set(data.holdings.filter((h) => h.shares > 0).map((h) => h.symbol))]
+    allSymbols.forEach((symbol) => {
+      // 缓存中没有的才查询
+      if (!getLiveQuote(symbol)) {
+        void fetchQuoteByCode(symbol).then(() => forceUpdate((n) => n + 1))
+      }
+    })
+  }, [data.holdings])
 
   // 走势 + 买卖点：根据用户第一个持仓动态显示
   const firstHolding = myHoldings[0]
