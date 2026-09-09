@@ -22,6 +22,50 @@ const cache = new Map<string, LiveQuote>()
 let started = false
 const subs = new Set<() => void>()
 
+// ===== 基于实时报价累积的分时数据（每15秒记录一次，交易中真实走势）=====
+export interface RealtimeMinutePoint { t: string; price: number; volume: number }
+const realtimeMinuteCache = new Map<string, RealtimeMinutePoint[]>()
+const REALTIME_MINUTE_KEY = 'finance.app.realtime.minute.v1'
+
+/** 读取本地缓存的实时分时数据 */
+function loadRealtimeMinute(): void {
+  try {
+    const raw = localStorage.getItem(REALTIME_MINUTE_KEY)
+    if (!raw) return
+    const all = JSON.parse(raw) as Record<string, { date: string; rows: RealtimeMinutePoint[] }>
+    const today = new Date().toISOString().slice(0, 10)
+    for (const [code, data] of Object.entries(all)) {
+      // 只保留今天的数据
+      if (data.date === today && data.rows && data.rows.length) {
+        realtimeMinuteCache.set(code, data.rows)
+      }
+    }
+  } catch { /* ignore */ }
+}
+
+/** 写入本地缓存的实时分时数据 */
+function saveRealtimeMinute(): void {
+  try {
+    const today = new Date().toISOString().slice(0, 10)
+    const all: Record<string, { date: string; rows: RealtimeMinutePoint[] }> = {}
+    for (const [code, rows] of realtimeMinuteCache) {
+      if (rows.length) all[code] = { date: today, rows }
+    }
+    localStorage.setItem(REALTIME_MINUTE_KEY, JSON.stringify(all))
+  } catch { /* ignore */ }
+}
+
+/** 获取基于实时报价累积的分时数据 */
+export function getRealtimeMinute(code: string): RealtimeMinutePoint[] | undefined {
+  return realtimeMinuteCache.get(code)
+}
+
+/** 清空实时分时数据（非交易时段或跨天时调用） */
+export function clearRealtimeMinute(): void {
+  realtimeMinuteCache.clear()
+  try { localStorage.removeItem(REALTIME_MINUTE_KEY) } catch { /* ignore */ }
+}
+
 /** 动态添加标的到行情轮询列表（用于用户持仓的非默认标的） */
 export function addQuoteSymbol(code: string): void {
   const isNew = !CODES.has(code)
@@ -62,6 +106,21 @@ function parse(text: string) {
   }
   if (fresh.size) {
     for (const [k, v] of fresh) cache.set(k, v)
+    // 累积实时分时数据（每15秒记录一次，交易中真实走势）
+    const now = new Date()
+    const hm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+    for (const [code, quote] of fresh) {
+      if (quote.price <= 0) continue
+      const series = realtimeMinuteCache.get(code) || []
+      // 避免重复记录同一分钟
+      if (series.length === 0 || series[series.length - 1].t !== hm) {
+        series.push({ t: hm, price: quote.price, volume: 0 })
+        // 最多保留400个点（约100分钟，足够覆盖交易时段）
+        if (series.length > 400) series.shift()
+        realtimeMinuteCache.set(code, series)
+      }
+    }
+    saveRealtimeMinute()
     notify()
   }
 }
@@ -84,6 +143,7 @@ export async function refreshQuotes(): Promise<void> {
 export function startQuotes(): void {
   if (started) return
   started = true
+  loadRealtimeMinute()
   void refreshQuotes()
   window.setInterval(() => { if (!document.hidden) void refreshQuotes() }, 15000)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) void refreshQuotes() })

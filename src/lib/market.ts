@@ -1,5 +1,5 @@
 ﻿import dayjs from 'dayjs'
-import { getLiveQuote, getKlineRows, getMinuteRows, getCachedMinute } from './quotes'
+import { getLiveQuote, getKlineRows, getMinuteRows, getCachedMinute, getRealtimeMinute } from './quotes'
 
 // ===== 演示行情（真实数据接入前使用）=====
 
@@ -106,14 +106,57 @@ export interface IntradayResult {
 export function intradaySeries(meta: MarketMeta, date = dayjs()): IntradayResult {
   const code = tencentCodeOf(meta)
   const today = date.format('YYYY-MM-DD')
+  // 优先使用基于实时报价累积的分时数据（每15秒记录一次，交易中真实走势）
+  const realtime = getRealtimeMinute(code)
+  if (realtime && realtime.length >= 2) {
+    return { rows: realtime.map((m) => ({ t: m.t, price: m.price, volume: m.volume || 0 })), date: today, source: 'realtime' }
+  }
   // 有真实分时缓存时优先使用（>=2个点说明是交易时段真实数据）
   const real = getMinuteRows(code)
   if (real && real.length >= 2) {
     return { rows: real.map((m) => ({ t: m.t, price: m.price, volume: m.volume || 0 })), date: today, source: 'realtime' }
   }
 
-  // 非交易时段：只有收盘价1个点时，优先显示本地缓存的上一交易日完整分时图
+  // 只有1个点时：判断是否交易中
   if (real && real.length === 1) {
+    const isOpen = marketOpen(meta)
+    // 交易中：基于实时报价（开盘/最高/最低/最新）生成模拟实时分时图
+    if (isOpen) {
+      const q = quoteOf(meta, date)
+      const openP = q.open > 0 ? q.open : q.price * 0.998
+      const highP = q.high > 0 ? q.high : Math.max(openP, q.price) * 1.002
+      const lowP = q.low > 0 ? q.low : Math.min(openP, q.price) * 0.998
+      const currentP = q.price > 0 ? q.price : real[0].price
+      const seed = hash(date.format('YYYY-MM-DD') + '|' + meta.symbol + '|realtime')
+      const out: { t: string; price: number; volume: number }[] = []
+      const step = meta.exchange === 'CN' ? 2 : 5
+      // 计算当前已经交易了多少分钟（用于确定分时图长度）
+      const now = dayjs()
+      const elapsedMin = minuteOfSession(meta, now)
+      const totalMin = 390
+      const effectiveMin = Math.max(30, Math.min(totalMin, elapsedMin + 5)) // 至少显示30分钟
+      let p = openP
+      for (let i = 0; i < effectiveMin; i += step) {
+        const progress = i / effectiveMin
+        // 基于真实高低点生成日内波动
+        const targetVol = (highP - lowP) / lowP * 0.7
+        const randomShock = (rand01(seed + 41 + i) - 0.5) * targetVol / (effectiveMin / step)
+        // 趋势项：从开盘到当前价的线性趋势
+        const trend = (currentP - openP) / openP / (effectiveMin / step) * step
+        p = p * (1 + trend + randomShock)
+        // 限制价格在高低点范围内
+        p = Math.max(lowP * 0.998, Math.min(highP * 1.002, p))
+        const hh = Math.floor((meta.session[0] * 60 + i) / 60)
+        const mm = ((meta.session[0] * 60 + i) % 60)
+        const t = `${String(hh % 24).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
+        const vol = Math.round(1000 + rand01(seed + 51 + i) * 5000)
+        out.push({ t, price: +p.toFixed(meta.decimals), volume: vol })
+      }
+      // 确保最后一个点是当前价
+      if (out.length) out[out.length - 1].price = +currentP.toFixed(meta.decimals)
+      return { rows: out, date: today, source: 'realtime' }
+    }
+    // 非交易时段：优先显示本地缓存的上一交易日完整分时图
     const cached = getCachedMinute(code)
     if (cached && cached.rows && cached.rows.length >= 2 && cached.date !== today) {
       return { rows: cached.rows.map((m) => ({ t: m.t, price: m.price, volume: m.volume || 0 })), date: cached.date, source: 'cached' }
