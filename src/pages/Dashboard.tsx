@@ -105,7 +105,7 @@ export default function Dashboard() {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <div className="text-[13px] font-medium text-slate-400 tracking-wide">净资产（总资产 − 总负债）</div>
           </div>
-          <div className="text-[clamp(32px,10vw,48px)] md:text-[58px] font-bold tracking-tight num mt-2 text-white leading-none">¥{fm(nw)}</div>
+          <div className="text-[clamp(38px,12vw,56px)] md:text-[64px] font-bold tracking-tight num mt-2 text-white leading-none" data-fit-min="28">¥{fm(nw)}</div>
           <div className="flex flex-wrap gap-x-7 gap-y-2 mt-4 text-[14px] text-slate-300 num">
             <span>总资产 <b className="text-emerald-600">¥{fmShort(assets)}</b></span>
             <span>总负债 <b className="text-red-500">¥{fmShort(debt)}</b></span>

@@ -4,6 +4,8 @@ export function ensureFits(): void {
   els.forEach((el) => {
     const base = el.dataset.fitBase || String(parseFloat(window.getComputedStyle(el).fontSize) || 14)
     el.dataset.fitBase = base
+    // 支持 data-fit-min 属性设置最小字号，默认 9px
+    const min = parseFloat(el.dataset.fitMin || '9')
 
     // 向上找到真正溢出的容器（最多 5 层）
     let anc: HTMLElement | null = el.parentElement
@@ -23,7 +25,6 @@ export function ensureFits(): void {
 
     // 从当前字号开始缩小，不要先重置为基础字号（避免先大后小的闪烁）
     let fs = parseFloat(window.getComputedStyle(el).fontSize)
-    const min = 9
     let guard = 0
     while (fs > min && guard++ < 30 && target.scrollWidth > target.clientWidth + 1) {
       fs -= 1
