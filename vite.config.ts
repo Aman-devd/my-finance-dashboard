@@ -6,6 +6,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 const buildTs = Date.now()
 
 export default defineConfig({
+  base: '/my-finance-dashboard/',
   plugins: [
     react(),
     tailwindcss(),
