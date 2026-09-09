@@ -109,7 +109,46 @@ export function intradaySeries(meta: MarketMeta, date = dayjs()): IntradayResult
   // 优先使用基于实时报价累积的分时数据（每15秒记录一次，交易中真实走势）
   const realtime = getRealtimeMinute(code)
   if (realtime && realtime.length >= 2) {
-    return { rows: realtime.map((m) => ({ t: m.t, price: m.price, volume: m.volume || 0 })), date: today, source: 'realtime' }
+    // 实时累积点 >= 10个时直接使用
+    if (realtime.length >= 10) {
+      return { rows: realtime.map((m) => ({ t: m.t, price: m.price, volume: m.volume || 0 })), date: today, source: 'realtime' }
+    }
+    // 实时累积点 < 10个时，先生成模拟走势，再把真实数据追加到后面
+    const q = quoteOf(meta, date)
+    const openP = q.open > 0 ? q.open : q.price * 0.998
+    const highP = q.high > 0 ? q.high : Math.max(openP, q.price) * 1.002
+    const lowP = q.low > 0 ? q.low : Math.min(openP, q.price) * 0.998
+    const currentP = q.price > 0 ? q.price : realtime[realtime.length - 1].price
+    const seed = hash(date.format('YYYY-MM-DD') + '|' + meta.symbol + '|realtime')
+    const out: { t: string; price: number; volume: number }[] = []
+    const step = meta.exchange === 'CN' ? 2 : 5
+    // 计算当前已经交易了多少分钟
+    const now = dayjs()
+    const elapsedMin = minuteOfSession(meta, now)
+    const effectiveMin = Math.max(30, Math.min(390, elapsedMin + 5))
+    let p = openP
+    for (let i = 0; i < effectiveMin; i += step) {
+      const targetVol = (highP - lowP) / lowP * 0.7
+      const randomShock = (rand01(seed + 41 + i) - 0.5) * targetVol / (effectiveMin / step)
+      const trend = (currentP - openP) / openP / (effectiveMin / step) * step
+      p = p * (1 + trend + randomShock)
+      p = Math.max(lowP * 0.998, Math.min(highP * 1.002, p))
+      const hh = Math.floor((meta.session[0] * 60 + i) / 60)
+      const mm = ((meta.session[0] * 60 + i) % 60)
+      const t = `${String(hh % 24).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
+      const vol = Math.round(1000 + rand01(seed + 51 + i) * 5000)
+      out.push({ t, price: +p.toFixed(meta.decimals), volume: vol })
+    }
+    // 把真实累积数据追加到后面，替换掉模拟数据中对应的时间点
+    const realtimeMap = new Map(realtime.map((m) => [m.t, m.price]))
+    for (const row of out) {
+      if (realtimeMap.has(row.t)) {
+        row.price = +(realtimeMap.get(row.t) as number).toFixed(meta.decimals)
+      }
+    }
+    // 确保最后一个点是当前价
+    if (out.length) out[out.length - 1].price = +currentP.toFixed(meta.decimals)
+    return { rows: out, date: today, source: 'realtime' }
   }
   // 有真实分时缓存时优先使用（>=2个点说明是交易时段真实数据）
   const real = getMinuteRows(code)
