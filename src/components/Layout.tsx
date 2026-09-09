@@ -198,21 +198,21 @@ export default function Layout() {
         border: '1px solid rgba(255,255,255,0.85)',
         boxShadow: '0 -8px 28px rgba(15,23,42,0.12), 0 -3px 8px rgba(15,23,42,0.06), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 1px rgba(255,255,255,0.5), inset 0 0 20px rgba(255,255,255,0.1)'
       }}>
-        <div className="grid grid-cols-5 h-[58px] pb-[env(safe-area-inset-bottom)] items-center">
+        <div className="grid grid-cols-5 h-[68px] px-2 pb-[env(safe-area-inset-bottom)] items-center gap-1.5">
           {MOBILE_BOTTOM.map((n) => {
             const active = n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)
             if (n.to === '/add') {
               return (
-                <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] text-[#0071e3] active:scale-100 touch-manipulation">
-                  <span className="fab-button w-16 h-11 -mt-5 text-white grid place-items-center"><Plus size={20} strokeWidth={2.5} /></span>
-                  <span className="font-medium -mt-0.5">记一笔</span>
+                <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] text-white active:scale-100 touch-manipulation">
+                  <span className="fab-button w-full h-[52px] -mt-6 text-white grid place-items-center"><Plus size={22} strokeWidth={2.5} /></span>
+                  <span className="font-medium -mt-0.5 text-[#0071e3]">记一笔</span>
                 </NavLink>
               )
             }
             return (
-              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] transition-colors duration-150 active:scale-100 touch-manipulation ${active ? 'text-[#0071e3]' : 'text-slate-500'}`}>
-                <span className={`w-9 h-9 rounded-full grid place-items-center transition-colors duration-150 ${active ? 'bg-[#0071e3]/10' : ''}`}><n.icon size={19} strokeWidth={2} /></span>
-                <span className={active ? 'font-semibold' : ''}>{n.label}</span>
+              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] h-[48px] rounded-full transition-all duration-150 active:scale-95 touch-manipulation ${active ? 'fab-button text-white' : 'btn-glass text-slate-600'}`}>
+                <n.icon size={18} strokeWidth={2} />
+                <span className={active ? 'font-semibold' : 'font-medium'}>{n.label}</span>
               </NavLink>
             )
           })}
