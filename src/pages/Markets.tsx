@@ -76,7 +76,7 @@ export default function Markets() {
 
   return (
     <div className="space-y-5">
-      <PageHead title="美股四大指数 · 纳指ETF" sub="行情与日K来自腾讯财经 · 15 秒刷新（交易时段为真实分时）" right={<Button variant="outline" onClick={() => setTick((t) => t + 1)}><RefreshCw size={15} /> 刷新</Button>} />
+      <PageHead title="美股四大指数 · 纳指ETF" sub="行情与日K来自腾讯财经 · 15 秒刷新（交易时段为真实分时）" right={<Button variant="outline" className="backdrop-blur-md bg-white/50 border-white/60 shadow-md" onClick={() => setTick((t) => t + 1)}><RefreshCw size={15} /> 刷新</Button>} />
 
       {/* 四大指数卡片 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
@@ -84,7 +84,7 @@ export default function Markets() {
           const qq = quoteOf(m)
           const up = qq.changePct >= 0
           return (
-            <button key={m.symbol} onClick={() => { setActive(m.symbol); setTab('intraday') }} className={cx('rounded-2xl p-3.5 text-left border bg-white shadow-sm transition', active === m.symbol ? 'border-blue-500 ring-2 ring-blue-100' : 'border-slate-100')}>
+            <button key={m.symbol} onClick={() => { setActive(m.symbol); setTab('intraday') }} className={cx('rounded-2xl p-3.5 text-left border backdrop-blur-md transition shadow-md', active === m.symbol ? 'border-blue-400/60 bg-white/60 ring-2 ring-blue-300/30' : 'border-white/50 bg-white/40')}>
               <div className="text-xs text-slate-500">{m.name}</div>
               <div className="text-lg font-bold num mt-0.5">{qq.price.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}</div>
               <div className={cx('text-xs num font-medium', up ? 'text-red-500' : 'text-emerald-600')}>{up ? '▲' : '▼'} {qq.changePct >= 0 ? '+' : ''}{qq.changePct.toFixed(2)}%</div>
