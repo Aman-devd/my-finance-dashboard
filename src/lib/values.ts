@@ -1,12 +1,23 @@
 ﻿import type { AppData, Account, Holding } from '../types'
 import { findMeta, priceOf } from './market'
+import { getLiveQuote } from './quotes'
 
 export function holdingsOf(data: AppData, accountId: string): Holding[] {
   return data.holdings.filter((h) => h.accountId === accountId && !(h.shares <= 0))
 }
 
+/** 获取标的的当前价：优先从行情缓存取真实价，取不到再用演示价 */
+function getPrice(symbol: string, date?: Parameters<typeof priceOf>[1]): number {
+  const live = getLiveQuote(symbol)
+  if (live && live.price > 0) return live.price
+  const meta = findMeta(symbol)
+  // 只有当 meta 确实是该标的时才用演示价，否则返回0（避免默认返回513100的价格）
+  if (meta.symbol === symbol) return priceOf(meta, date)
+  return 0
+}
+
 export function holdingMv(h: Holding, date?: Parameters<typeof priceOf>[1]): number {
-  return h.shares * priceOf(findMeta(h.symbol), date)
+  return h.shares * getPrice(h.symbol, date)
 }
 
 export function holdingCost(h: Holding): number {
@@ -45,8 +56,7 @@ export interface InvestmentHoldingView extends Holding {
 
 export function investmentView(data: AppData, date?: Parameters<typeof priceOf>[1]): InvestmentHoldingView[] {
   return data.holdings.filter((h) => h.shares > 0).map((h) => {
-    const meta = findMeta(h.symbol)
-    const price = priceOf(meta, date)
+    const price = getPrice(h.symbol, date)
     const mv = h.shares * price
     const cost = h.shares * h.avgCost
     return { ...h, price, mv, cost, pnl: mv - cost, pnlPct: cost > 0 ? ((mv - cost) / cost) * 100 : 0 }

@@ -4,7 +4,7 @@ import { moneyShort } from '../lib/format'
 import { useApp } from '../lib/store'
 import { investmentView, investmentTotals } from '../lib/values'
 import { findMeta, quoteOf, klineSeries, createMetaFromCode } from '../lib/market'
-import { fetchQuoteByCode } from '../lib/quotes'
+import { fetchQuoteByCode, getLiveQuote } from '../lib/quotes'
 import { Button, Card, DateInput, Empty, Field, Modal, PageHead, Select, Segmented, Tag, TextInput, cx } from '../components/ui'
 import { EChart, lineOption, barOption, pieOption } from '../components/charts'
 import { Plus, TrendingUp, TrendingDown, Trash2, Search, Loader2, Pencil } from 'lucide-react'
@@ -254,18 +254,16 @@ function TradeModal({ accountId, accounts, onClose, onSave }: { accountId: strin
   useEffect(() => {
     const code = codeInput.trim().toLowerCase()
     if (!code) { setFoundName(''); setFoundPrice(0); setSearchError(''); return }
-    // 先检查预设标的
+    // 先检查预设标的，设置名称
     const hot = HOT_SYMBOLS.find((s) => s.symbol === code)
-    if (hot) {
-      setFoundName(hot.name)
-      // 尝试从缓存获取价格
-      const meta = findMeta(code)
-      if (meta) {
-        const q = quoteOf(meta)
-        if (q.price > 0) { setFoundPrice(q.price); setSearchError(''); return }
-      }
+    if (hot) setFoundName(hot.name)
+    // 先尝试从缓存获取价格
+    const cached = getLiveQuote(code)
+    if (cached && cached.price > 0) {
+      setFoundPrice(cached.price)
+      if (!hot) setFoundName(cached.symbol)
     }
-    // 自动查询
+    // 自动查询（防抖500ms）
     const timer = setTimeout(async () => {
       setSearching(true)
       setSearchError('')
@@ -274,7 +272,7 @@ function TradeModal({ accountId, accounts, onClose, onSave }: { accountId: strin
       if (result) {
         setFoundName(result.name)
         setFoundPrice(result.quote.price)
-      } else {
+      } else if (!cached) {
         setFoundName('')
         setFoundPrice(0)
         setSearchError('未找到该标的行情，请检查代码格式（如 sh513100、sz000001）')
