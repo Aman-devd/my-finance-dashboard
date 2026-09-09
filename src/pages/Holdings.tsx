@@ -16,6 +16,7 @@ export default function Holdings() {
   const [accId, setAccId] = useState(secAccounts[0]?.id || '')
   const [open, setOpen] = useState(false)
   const [selectedSymbol, setSelectedSymbol] = useState<string>('')
+  const [quotesLoading, setQuotesLoading] = useState(true)
   // 订阅行情更新，行情刷新后自动重新渲染
   useLiveQuotes()
 
@@ -27,7 +28,38 @@ export default function Holdings() {
   // 页面加载时把用户持仓的标的添加到行情轮询列表（解决sz159941等非默认标的获取不到行情的问题）
   useEffect(() => {
     const allSymbols = [...new Set(data.holdings.filter((h) => h.shares > 0).map((h) => h.symbol))]
+    if (allSymbols.length === 0) {
+      setQuotesLoading(false)
+      return
+    }
+    setQuotesLoading(true)
+    // 检查是否所有标的都已经有行情数据
+    const checkLoaded = () => {
+      const allLoaded = allSymbols.every((s) => {
+        const q = getLiveQuote(s)
+        return q && q.price > 0
+      })
+      if (allLoaded) {
+        setQuotesLoading(false)
+        return true
+      }
+      return false
+    }
+    // 添加标的到轮询列表
     allSymbols.forEach((symbol) => addQuoteSymbol(symbol))
+    // 立即检查一次
+    if (!checkLoaded()) {
+      // 每500ms检查一次，最多等10秒
+      let attempts = 0
+      const timer = setInterval(() => {
+        attempts++
+        if (checkLoaded() || attempts >= 20) {
+          clearInterval(timer)
+          setQuotesLoading(false)
+        }
+      }, 500)
+      return () => clearInterval(timer)
+    }
   }, [data.holdings])
 
   // 走势 + 买卖点：根据用户选中的持仓动态显示，包含持仓成本线
@@ -81,6 +113,14 @@ export default function Holdings() {
   return (
     <div className="space-y-5">
       <PageHead title="持仓与盈亏" sub="份额 × 最新价 = 市值（行情来自腾讯财经）" right={<Button onClick={() => setOpen(true)}><Plus size={16} /> 记录买卖</Button>} />
+
+      {/* 行情加载提示 */}
+      {quotesLoading && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 flex items-center gap-2">
+          <Loader2 size={14} className="text-amber-500 animate-spin" />
+          <span className="text-xs text-amber-700">正在加载实时行情数据，稍候片刻...</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-2">
         <Card className="p-3.5 text-center border-slate-200/60">
