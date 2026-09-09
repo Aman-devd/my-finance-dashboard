@@ -4,7 +4,7 @@ import { moneyShort } from '../lib/format'
 import { useApp } from '../lib/store'
 import { investmentView, investmentTotals } from '../lib/values'
 import { findMeta, quoteOf, klineSeries, createMetaFromCode } from '../lib/market'
-import { fetchQuoteByCode, getLiveQuote, addQuoteSymbol } from '../lib/quotes'
+import { fetchQuoteByCode, getLiveQuote, addQuoteSymbol, useLiveQuotes } from '../lib/quotes'
 import { Button, Card, DateInput, Empty, Field, Modal, PageHead, Select, Segmented, Tag, TextInput, cx } from '../components/ui'
 import { EChart, lineOption, barOption, pieOption } from '../components/charts'
 import { Plus, TrendingUp, TrendingDown, Trash2, Search, Loader2, Pencil } from 'lucide-react'
@@ -15,6 +15,9 @@ export default function Holdings() {
   const secAccounts = data.accounts.filter((a) => a.category === 'securities')
   const [accId, setAccId] = useState(secAccounts[0]?.id || '')
   const [open, setOpen] = useState(false)
+  const [selectedSymbol, setSelectedSymbol] = useState<string>('')
+  // 订阅行情更新，行情刷新后自动重新渲染
+  useLiveQuotes()
 
   const views = useMemo(() => investmentView(data), [data])
   const totals = useMemo(() => investmentTotals(data), [data])
@@ -27,18 +30,18 @@ export default function Holdings() {
     allSymbols.forEach((symbol) => addQuoteSymbol(symbol))
   }, [data.holdings])
 
-  // 走势 + 买卖点：根据用户第一个持仓动态显示，包含持仓成本线
-  const firstHolding = myHoldings[0]
+  // 走势 + 买卖点：根据用户选中的持仓动态显示，包含持仓成本线
+  const selectedHolding = myHoldings.find((h) => h.symbol === selectedSymbol) || myHoldings[0]
   const chart = useMemo(() => {
-    if (!firstHolding) return null
-    const meta = createMetaFromCode(firstHolding.symbol, firstHolding.name)
+    if (!selectedHolding) return null
+    const meta = createMetaFromCode(selectedHolding.symbol, selectedHolding.name)
     const k = klineSeries(meta, 90)
     const dates = k.map((x) => x.date)
     const closes = k.map((x) => x.close)
-    const costPrice = firstHolding.avgCost
-    const opt = lineOption(dates, [{ name: firstHolding.name, data: closes, color: '#0071e3', area: true }], { yFmt: (v) => v.toFixed(3) }) as unknown as { series: { markPoint?: unknown; markLine?: unknown }[] }
+    const costPrice = selectedHolding.avgCost
+    const opt = lineOption(dates, [{ name: selectedHolding.name, data: closes, color: '#0071e3', area: true }], { yFmt: (v) => v.toFixed(3) }) as unknown as { series: { markPoint?: unknown; markLine?: unknown }[] }
     const points = myTrades
-      .filter((t) => t.symbol === firstHolding.symbol && dates.includes(t.date))
+      .filter((t) => t.symbol === selectedHolding.symbol && dates.includes(t.date))
       .map((t) => ({ coord: [dates.indexOf(t.date), t.price], value: t.side === 'buy' ? '买' : '卖', itemStyle: { color: t.side === 'buy' ? '#dc2626' : '#16a34a' }, symbol: 'circle', symbolSize: 11, borderWidth: 2, borderColor: '#fff', label: { show: true, formatter: t.side === 'buy' ? '买' : '卖', color: t.side === 'buy' ? '#dc2626' : '#16a34a', fontSize: 9, position: 'right' as const, distance: 2 } }))
     if (opt.series && opt.series[0]) {
       ;(opt.series[0] as { markPoint?: unknown }).markPoint = { data: points, symbolOffset: [0, -4] }
@@ -65,8 +68,8 @@ export default function Holdings() {
         ],
       }
     }
-    return { option: opt as never, dates, closes, name: firstHolding.name, costPrice }
-  }, [myTrades, data, firstHolding])
+    return { option: opt as never, dates, closes, name: selectedHolding.name, costPrice }
+  }, [myTrades, data, selectedHolding])
 
   const fm = (n: number) => n.toLocaleString('zh-CN', { minimumFractionDigits: 2 })
   const pct = (n: number) => (n >= 0 ? '+' : '') + n.toFixed(2) + '%'
@@ -103,9 +106,37 @@ export default function Holdings() {
           const mv = hs.reduce((s, v) => s + v.mv, 0)
           return { name: a.name, cost, mv, pnl: mv - cost, pnlPct: cost > 0 ? ((mv - cost) / cost) * 100 : 0, cash: a.balance, count: hs.length, color: ACC_COLORS[i % ACC_COLORS.length] }
         })
-        const k90 = klineSeries(findMeta('sh513100'), 90)
-        const comboDates = k90.map((x) => x.date)
-        const comboValues = k90.map((kk) => views.reduce((s, v) => s + v.shares * kk.close, 0))
+        // 合并收益走势：计算每个持仓的每日收益，然后合并
+        const allHoldings = views.filter((v) => v.shares > 0)
+        let comboDates: string[] = []
+        let comboPnlValues: number[] = []
+        if (allHoldings.length > 0) {
+          // 获取每个持仓的日K数据
+          const klineMap = new Map<string, Map<string, number>>()
+          for (const h of allHoldings) {
+            const meta = createMetaFromCode(h.symbol, h.name)
+            const k = klineSeries(meta, 90)
+            const dateMap = new Map<string, number>()
+            k.forEach((x) => dateMap.set(x.date, x.close))
+            klineMap.set(h.symbol, dateMap)
+          }
+          // 取第一个持仓的日期作为基准
+          const firstKline = klineMap.get(allHoldings[0].symbol)
+          if (firstKline) {
+            comboDates = [...firstKline.keys()].sort()
+            comboPnlValues = comboDates.map((date) => {
+              let totalPnl = 0
+              for (const h of allHoldings) {
+                const dateMap = klineMap.get(h.symbol)
+                const close = dateMap?.get(date)
+                if (close && close > 0) {
+                  totalPnl += (close - h.avgCost) * h.shares
+                }
+              }
+              return Math.round(totalPnl)
+            })
+          }
+        }
         const totalCost = accStats.reduce((s, a) => s + a.cost, 0)
         const totalMv = accStats.reduce((s, a) => s + a.mv, 0)
         return (
@@ -167,8 +198,8 @@ export default function Holdings() {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <div className="text-[11px] text-slate-400 mb-1">合并市值走势（近 90 日，按当前持仓估算）</div>
-                  <EChart option={lineOption(comboDates, [{ name: '合并市值', data: comboValues.map((v) => Math.round(v)), color: '#0071e3', area: true }], { yFmt: (v) => (v / 10000).toFixed(1) + '万' })} height={200} />
+                  <div className="text-[11px] text-slate-400 mb-1">合并收益走势（近 90 日，按当前持仓估算）</div>
+                  <EChart option={lineOption(comboDates, [{ name: '合并收益', data: comboPnlValues, color: '#0071e3', area: true }], { yFmt: (v) => (v >= 0 ? '+' : '') + (v / 10000).toFixed(1) + '万' })} height={200} />
                 </div>
               </>
             )}
@@ -182,20 +213,39 @@ export default function Holdings() {
         <span className="text-xs text-slate-400">切换到账户查看明细与买卖点</span>
       </div>
 
-      {/* 走势 + 买卖点：只有当有持仓时才显示 */}
-      {chart && firstHolding && (
+      {/* 走势 + 买卖点：只有当有持仓时才显示，支持切换持仓 */}
+      {chart && selectedHolding && (
         <Card className="p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h3 className="text-sm font-semibold">{chart.name} 走势与买卖点</h3>
               <div className="flex items-center gap-3 mt-1 text-[11px]">
-                <span className="text-slate-400">现价 <span className="font-semibold text-slate-700 num">¥{firstHolding.price.toFixed(3)}</span></span>
+                <span className="text-slate-400">现价 <span className="font-semibold text-slate-700 num">¥{selectedHolding.price.toFixed(3)}</span></span>
                 <span className="text-slate-400">成本 <span className="font-semibold text-orange-500 num">¥{chart.costPrice.toFixed(3)}</span></span>
-                <span className={cx('font-semibold num', firstHolding.pnl >= 0 ? 'text-red-500' : 'text-emerald-600')}>{firstHolding.pnl >= 0 ? '+' : ''}{firstHolding.pnl.toFixed(2)}（{pct(firstHolding.pnlPct)}）</span>
+                <span className={cx('font-semibold num', selectedHolding.pnl >= 0 ? 'text-red-500' : 'text-emerald-600')}>{selectedHolding.pnl >= 0 ? '+' : ''}{selectedHolding.pnl.toFixed(2)}（{pct(selectedHolding.pnlPct)}）</span>
               </div>
             </div>
             <span className="text-[10px] text-slate-300">近 90 个交易日</span>
           </div>
+          {/* 持仓切换标签 */}
+          {myHoldings.length > 1 && (
+            <div className="flex gap-1.5 mb-3 flex-wrap">
+              {myHoldings.map((h) => (
+                <button
+                  key={h.id}
+                  onClick={() => setSelectedSymbol(h.symbol)}
+                  className={cx(
+                    'px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all',
+                    selectedHolding.symbol === h.symbol
+                      ? 'bg-[#0071e3] text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                  )}
+                >
+                  {h.name}
+                </button>
+              ))}
+            </div>
+          )}
           <EChart option={chart.option} height={240} />
           <div className="flex items-center gap-4 mt-2 text-[10px] text-slate-400">
             <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-[#0071e3] inline-block"></span> 价格走势</span>
@@ -214,7 +264,7 @@ export default function Holdings() {
         {myHoldings.length === 0 && <div className="px-4 pb-4"><Empty text="该账户暂无持仓，记录一笔买入吧" /></div>}
         <div className="divide-y divide-slate-100">
           {myHoldings.map((h) => (
-            <div key={h.id} className="px-4 py-3 flex items-center gap-3 group hover:bg-slate-50/50 transition-colors">
+            <div key={h.id} onClick={() => setSelectedSymbol(h.symbol)} className={cx('px-4 py-3 flex items-center gap-3 group hover:bg-slate-50/50 transition-colors cursor-pointer', selectedHolding?.symbol === h.symbol && 'bg-blue-50/30')}>
               <span className={cx('w-10 h-10 rounded-xl grid place-items-center text-xs font-bold shrink-0', h.pnl >= 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600')}>{h.name.slice(0, 2)}</span>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-semibold text-slate-900">{h.name} <span className="text-[10px] text-slate-400 font-normal">{h.symbol}</span></div>

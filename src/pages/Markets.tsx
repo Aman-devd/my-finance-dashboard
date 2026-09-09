@@ -136,6 +136,26 @@ export default function Markets() {
               <span className="text-3xl font-bold num">{q.price.toLocaleString('zh-CN', { minimumFractionDigits: meta.decimals, maximumFractionDigits: meta.decimals })}</span>
               <span className={cx('text-sm num font-semibold mb-1', q.changePct >= 0 ? 'text-red-500' : 'text-emerald-600')}>{q.changePct >= 0 ? <TrendingUp size={14} className="inline" /> : <TrendingDown size={14} className="inline" />}{q.changePct >= 0 ? '+' : ''}{q.changePct.toFixed(2)}%</span>
             </div>
+            {/* 用户持仓信息 */}
+            {(() => {
+              const myPositions = views.filter((v) => v.symbol === meta.symbol)
+              if (myPositions.length === 0) return null
+              const totalShares = myPositions.reduce((s, v) => s + v.shares, 0)
+              const totalCost = myPositions.reduce((s, v) => s + v.cost, 0)
+              const avgCost = totalShares > 0 ? totalCost / totalShares : 0
+              const totalMv = totalShares * q.price
+              const totalPnl = totalMv - totalCost
+              const pnlPct = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0
+              return (
+                <div className="mt-2 flex items-center gap-3 text-[11px] bg-orange-50/60 rounded-lg px-2.5 py-1.5 border border-orange-100">
+                  <span className="text-orange-500 font-medium">我的持仓</span>
+                  <span className="text-slate-500 num">{totalShares.toLocaleString()} 份</span>
+                  <span className="text-slate-500">成本 <span className="font-semibold text-orange-600 num">¥{avgCost.toFixed(3)}</span></span>
+                  <span className="text-slate-500">市值 <span className="font-semibold text-slate-700 num">¥{totalMv.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}</span></span>
+                  <span className={cx('font-semibold num', totalPnl >= 0 ? 'text-red-500' : 'text-emerald-600')}>{totalPnl >= 0 ? '+' : ''}{totalPnl.toLocaleString('zh-CN', { maximumFractionDigits: 2 })}（{pnlPct >= 0 ? '+' : ''}{pnlPct.toFixed(2)}%）</span>
+                </div>
+              )
+            })()}
           </div>
           <div className="text-[11px] text-slate-400 text-right leading-5 num">
             今开 {q.open.toLocaleString()}<br />最高 {q.high.toLocaleString()} · 最低 {q.low.toLocaleString()}<br />52周高 {yr.high.toLocaleString()} · 低 {yr.low.toLocaleString()}
