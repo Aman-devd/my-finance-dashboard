@@ -96,11 +96,16 @@ export default function Dashboard() {
   return (
     <div className="space-y-5">
       {/* 净资产 Hero */}
-      <Card className="relative text-white border-0 overflow-hidden" style={{ background: 'linear-gradient(160deg, #0d1b3a 0%, #14295b 55%, #1b346e 100%)', boxShadow: '0 24px 60px -30px rgba(13,27,58,.55)' }}>
-        <div aria-hidden className="hidden md:block pointer-events-none absolute -top-24 -right-16 w-80 h-80 rounded-full opacity-30" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(125,175,255,.8), transparent 65%)' }} />
-        <div className="relative p-6 md:p-10">
-          <div className="text-[15px] font-medium text-slate-400">净资产（总资产 − 总负债）</div>
-          <div className="text-[clamp(30px,9.5vw,42px)] md:text-[56px] font-bold tracking-tight num mt-2 text-white">¥ {fm(nw)}</div>
+      <Card className="relative text-white border-0 overflow-hidden" style={{ background: 'linear-gradient(145deg, #0a1628 0%, #122547 40%, #1a3360 70%, #1e3d72 100%)', boxShadow: '0 20px 50px -25px rgba(10,22,40,0.6), 0 8px 20px -12px rgba(10,22,40,0.4)' }}>
+        <div aria-hidden className="pointer-events-none absolute -top-32 -right-20 w-96 h-96 rounded-full opacity-25" style={{ background: 'radial-gradient(circle at 40% 40%, rgba(96,165,250,0.9), transparent 65%)' }} />
+        <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-16 w-72 h-72 rounded-full opacity-15" style={{ background: 'radial-gradient(circle at 60% 60%, rgba(59,130,246,0.8), transparent 60%)' }} />
+        <div aria-hidden className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <div className="relative p-6 md:p-9">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="text-[13px] font-medium text-slate-400 tracking-wide">净资产（总资产 − 总负债）</div>
+          </div>
+          <div className="text-[clamp(32px,10vw,48px)] md:text-[58px] font-bold tracking-tight num mt-2 text-white leading-none">¥{fm(nw)}</div>
           <div className="flex flex-wrap gap-x-7 gap-y-2 mt-4 text-[14px] text-slate-300 num">
             <span>总资产 <b className="text-emerald-600">¥{fmShort(assets)}</b></span>
             <span>总负债 <b className="text-red-500">¥{fmShort(debt)}</b></span>

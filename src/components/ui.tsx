@@ -8,7 +8,7 @@ export function cx(...cls: (string | false | null | undefined)[]) {
 export function Card({ className, children, onClick, style }: { className?: string; children: React.ReactNode; onClick?: () => void; style?: React.CSSProperties }) {
   const hasBg = typeof className === 'string' && /(^|\s)bg-/.test(className)
   return (
-    <div onClick={onClick} style={style} className={cx(!hasBg && 'bg-white', 'rounded-xl border border-slate-200/80 shadow-none', onClick && 'cursor-pointer transition-shadow duration-200 hover:shadow-[0_10px_26px_-16px_rgba(15,23,42,.2)] active:opacity-90', className)}>
+    <div onClick={onClick} style={style} className={cx(!hasBg && 'bg-white', 'rounded-2xl border border-slate-200/60 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_1px_2px_rgba(15,23,42,0.03)]', onClick && 'cursor-pointer transition-all duration-200 hover:shadow-[0_8px_24px_-12px_rgba(15,23,42,0.15)] hover:border-slate-300/60 active:opacity-90 active:scale-[0.995]', className)}>
       {children}
     </div>
   )
@@ -26,14 +26,14 @@ export function SectionTitle({ children, right }: { children: React.ReactNode; r
 type BtnVariant = 'primary' | 'ghost' | 'danger' | 'soft' | 'outline'
 export function Button({ variant = 'primary', className, children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: BtnVariant }) {
   const styles: Record<BtnVariant, string> = {
-    primary: 'bg-blue-600 text-white shadow-[0_1px_2px_rgba(37,99,235,.28)] hover:bg-blue-700 active:bg-blue-800',
-    ghost: 'text-slate-500 hover:bg-slate-100',
-    danger: 'bg-red-50 text-red-600 hover:bg-red-100',
-    soft: 'bg-slate-100 text-slate-700 hover:bg-slate-200',
-    outline: 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
+    primary: 'bg-[#0071e3] text-white shadow-[0_1px_3px_rgba(0,113,227,0.3),0_1px_2px_rgba(0,113,227,0.2)] hover:bg-[#0077ed] hover:shadow-[0_4px_12px_rgba(0,113,227,0.35)] active:bg-[#006edb] active:shadow-[0_1px_2px_rgba(0,113,227,0.3)]',
+    ghost: 'text-slate-500 hover:bg-slate-100 hover:text-slate-700',
+    danger: 'bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700',
+    soft: 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900',
+    outline: 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900',
   }
   return (
-    <button className={cx('inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium transition disabled:opacity-50 disabled:pointer-events-none', styles[variant], className)} {...rest}>
+    <button className={cx('inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]', styles[variant], className)} {...rest}>
       {children}
     </button>
   )
@@ -49,7 +49,7 @@ export function Field({ label, children, hint }: { label: string; children: Reac
   )
 }
 
-const inputCls = 'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 outline-none transition hover:border-slate-300 focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/15 placeholder:text-slate-400'
+const inputCls = 'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 outline-none transition-all duration-200 hover:border-slate-300 focus:border-[#0071e3] focus:ring-[3px] focus:ring-[#0071e3]/12 placeholder:text-slate-400 text-slate-900'
 export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cx(inputCls, props.className)} />
 }
@@ -64,11 +64,11 @@ export function Modal({ open, title, onClose, children, footer }: { open: boolea
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px]" onClick={onClose} />
-      <div className="relative w-full sm:max-w-md bg-white rounded-t-[1.5rem] sm:rounded-xl border border-slate-200/80 max-h-[92vh] overflow-auto p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] animate-pop shadow-[0_20px_60px_-20px_rgba(15,23,42,.3)]">
+      <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-[3px]" onClick={onClose} />
+      <div className="relative w-full sm:max-w-md bg-white rounded-t-[1.75rem] sm:rounded-2xl border border-slate-200/50 max-h-[92vh] overflow-auto p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] animate-pop shadow-[0_24px_64px_-16px_rgba(15,23,42,0.35),0_8px_24px_-8px_rgba(15,23,42,0.2)]">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <button onClick={onClose} aria-label="关闭" className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 grid place-items-center transition hover:bg-slate-200"><X size={16} /></button>
+          <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+          <button onClick={onClose} aria-label="关闭" className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 grid place-items-center transition hover:bg-slate-200 hover:text-slate-700 active:scale-95"><X size={16} /></button>
         </div>
         <div>{children}</div>
         {footer && <div className="mt-5 flex gap-2 justify-end">{footer}</div>}
@@ -79,9 +79,9 @@ export function Modal({ open, title, onClose, children, footer }: { open: boolea
 
 export function Segmented({ options, value, onChange }: { options: { value: string; label: string }[]; value: string; onChange: (v: string) => void }) {
   return (
-    <div className="inline-flex max-w-full overflow-x-auto rounded-lg bg-slate-100 p-1">
+    <div className="inline-flex max-w-full overflow-x-auto rounded-xl bg-slate-100/80 p-1 backdrop-blur-sm">
       {options.map((o) => (
-        <button key={o.value} onClick={() => onChange(o.value)} className={cx('px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition', value === o.value ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500')}>
+        <button key={o.value} onClick={() => onChange(o.value)} className={cx('px-3.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200', value === o.value ? 'bg-white shadow-[0_1px_3px_rgba(15,23,42,0.1),0_1px_2px_rgba(15,23,42,0.06)] text-slate-900' : 'text-slate-500 hover:text-slate-700')}>
           {o.label}
         </button>
       ))}
@@ -128,10 +128,10 @@ export function MoneyText({ value, className, colored = true }: { value: number;
 
 export function PageHead({ title, sub, right }: { title: string; sub?: string; right?: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2 mb-5">
+    <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2 mb-6">
       <div className="min-w-0 flex-1">
-        <h1 className="text-[27px] md:text-[32px] font-bold tracking-tight text-[#0f172a]">{title}</h1>
-        {sub && <p className="text-[13px] text-slate-500 mt-1 leading-5">{sub}</p>}
+        <h1 className="text-[28px] md:text-[34px] font-bold tracking-tight text-[#0f172a] leading-tight">{title}</h1>
+        {sub && <p className="text-[13px] text-slate-500 mt-1.5 leading-5">{sub}</p>}
       </div>
       {right && <div className="shrink-0">{right}</div>}
     </div>
