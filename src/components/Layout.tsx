@@ -175,15 +175,15 @@ export default function Layout() {
             const active = n.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(n.to)
             if (n.to === '/add') {
               return (
-                <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] text-[#0071e3]">
-                  <span className="w-11 h-11 -mt-5 rounded-full bg-gradient-to-br from-[#0071e3] to-[#005bb5] text-white grid place-items-center shadow-[0_4px_12px_rgba(0,113,227,0.4)] active:scale-95 transition-transform"><Plus size={21} /></span>
+                <NavLink key={n.to} to="/add" className="relative flex flex-col items-center justify-center text-[10px] text-[#0071e3] active:scale-100 touch-manipulation">
+                  <span className="w-11 h-11 -mt-5 rounded-full bg-gradient-to-br from-[#0071e3] to-[#005bb5] text-white grid place-items-center shadow-[0_4px_12px_rgba(0,113,227,0.4)]"><Plus size={21} /></span>
                   <span className="font-medium -mt-0.5">记一笔</span>
                 </NavLink>
               )
             }
             return (
-              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] transition-all duration-200 ${active ? 'text-[#0071e3]' : 'text-slate-400'}`}>
-                <span className={`w-9 h-9 rounded-full grid place-items-center transition-all duration-200 ${active ? 'bg-[#0071e3]/10' : ''}`}><n.icon size={19} strokeWidth={active ? 2.2 : 2} /></span>
+              <NavLink key={n.to} to={n.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] transition-colors duration-150 active:scale-100 touch-manipulation ${active ? 'text-[#0071e3]' : 'text-slate-400'}`}>
+                <span className={`w-9 h-9 rounded-full grid place-items-center transition-colors duration-150 ${active ? 'bg-[#0071e3]/10' : ''}`}><n.icon size={19} strokeWidth={2} /></span>
                 <span className={active ? 'font-semibold' : ''}>{n.label}</span>
               </NavLink>
             )
