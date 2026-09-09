@@ -44,9 +44,13 @@ input, textarea, select, [contenteditable="true"] {
 
 /* 交互与动效优化 */
 * { -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; touch-action: manipulation; }
 button:not(:disabled) { transition: transform .15s cubic-bezier(.4,0,.2,1), opacity .15s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease, color .15s ease; }
 button:not(:disabled):active { transform: scale(.97); }
 a { -webkit-tap-highlight-color: transparent; transition: color .15s ease, opacity .15s ease; }
+/* 底部导航禁止点击缩放 */
+nav a, nav button { touch-action: manipulation; }
+nav a:active, nav button:active { transform: none !important; }
 
 @keyframes fadeIn {
   from { opacity: 0; }

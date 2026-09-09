@@ -163,7 +163,7 @@ export default function Layout() {
 
       {/* 主内容 */}
       <main className="md:pl-60">
-        <div key={loc.pathname} className="mx-auto max-w-6xl px-5 py-6 md:py-10 pb-32 md:pb-14 page-anim">
+        <div className="mx-auto max-w-6xl px-5 py-6 md:py-10 pb-32 md:pb-14">
           <Outlet />
         </div>
       </main>
