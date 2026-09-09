@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { useApp } from '../lib/store'
 import { ensureFits } from '../lib/fitText'
+import { addQuoteSymbol, useLiveQuotes } from '../lib/quotes'
 import { Home, Wallet, List, TrendingUp, Bell, Users, Car, Calculator, Settings, Plus, Target, Activity, Menu, X, Sparkles, PieChart, BarChart3, Coins, CalendarDays, Repeat, Fuel, HandCoins, KeyRound, LogOut } from 'lucide-react'
 
 export interface NavItem { to: string; label: string; icon: React.ComponentType<{ size?: number | string; className?: string; strokeWidth?: number }>; section?: boolean }
@@ -50,13 +51,22 @@ export default function Layout() {
   const loc = useLocation()
   const title = titleOf(loc.pathname)
 
+  // 全局行情订阅：所有页面都能实时更新行情
+  useLiveQuotes()
+
+  // 应用启动时立即加载所有持仓标的的行情（不用等进入持仓页面）
+  const { data, syncError, saving, lastSavedAt } = useApp()
+  useEffect(() => {
+    const allSymbols = [...new Set(data.holdings.filter((h) => h.shares > 0).map((h) => h.symbol))]
+    allSymbols.forEach((symbol) => addQuoteSymbol(symbol))
+  }, [data.holdings])
+
   // 切换页面时回到顶部
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
   }, [loc.pathname])
 
   const { user, logout } = useAuth()
-  const { syncError, saving, lastSavedAt } = useApp()
   const [justSaved, setJustSaved] = useState(false)
   useEffect(() => {
     if (lastSavedAt > 0) {
