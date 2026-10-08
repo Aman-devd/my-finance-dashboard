@@ -1,7 +1,7 @@
 ﻿import React, { createContext, useContext, useEffect, useState } from 'react'
-import { supabase, cloudReady, cloudEmailOf, cloudErrorHint, getCloudUser } from './cloud'
+import { supabase, cloudReady, cloudEmailOf, cloudErrorHint, getCloudUser, isCloudOnline, isNetworkError, probeCloud, subscribeCloudOnline } from './cloud'
 
-// ===== 账号与会话：云端优先，未配置云端时退回本地演示 =====
+// ===== 账号与会话：云端优先，云端不可达时自动降级本地，保证随时可用 =====
 const USERS_KEY = 'fin.users.v1'
 const SESSION_KEY = 'fin.session.v1'
 const LOCK_KEY = 'fin.lock.v1'
@@ -38,6 +38,7 @@ async function digest(text: string): Promise<string> {
 function readUsers(): LocalUser[] { try { const r = localStorage.getItem(USERS_KEY); return r ? JSON.parse(r) : [] } catch { return [] } }
 function writeUsers(list: LocalUser[]) { try { localStorage.setItem(USERS_KEY, JSON.stringify(list)) } catch { /* ignore */ } }
 function readSession(): Session | null { try { const r = localStorage.getItem(SESSION_KEY); return r ? JSON.parse(r) : null } catch { return null } }
+function writeSession(s: Session) { try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)) } catch { /* ignore */ } }
 function readLocks(): Record<string, LockRecord> { try { const r = localStorage.getItem(LOCK_KEY); return r ? JSON.parse(r) : {} } catch { return {} } }
 function writeLocks(l: Record<string, LockRecord>) { try { localStorage.setItem(LOCK_KEY, JSON.stringify(l)) } catch { /* ignore */ } }
 
@@ -45,6 +46,7 @@ export interface AuthUser { username: string; email?: string }
 interface AuthApi {
   ready: boolean
   cloud: boolean
+  cloudOnline: boolean
   user: AuthUser | null
   login: (username: string, password: string) => Promise<string | null>
   register: (username: string, email: string | undefined, password: string) => Promise<string | null>
@@ -61,9 +63,42 @@ async function fetchMeta(uid: string): Promise<AuthUser | null> {
   return null
 }
 
+/** 用本地用户表验证账号（云端不可达时的降级入口，校验逻辑与云端一致） */
+async function localLogin(username: string, password: string): Promise<string | null> {
+  const list = readUsers()
+  const rec = list.find((x) => x.username.toLowerCase() === username.toLowerCase())
+  if (!rec) return '账号不存在，请先注册'
+  const h = await digest(password + salt(rec.username))
+  if (h !== rec.hash) return '密码不对'
+  writeSession({ username: rec.username, expiresAt: Date.now() + SESSION_MS })
+  return null
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false)
   const [user, setUser] = useState<AuthUser | null>(null)
+  const [cloudOnline, setCloudOnline] = useState<boolean>(isCloudOnline())
+
+  useEffect(() => {
+    // 订阅云端在线状态变化（后台自动重连时同步 UI）
+    const un = subscribeCloudOnline(setCloudOnline)
+    return un
+  }, [])
+
+  /** 尝试从本地会话恢复（云端不可达时的免登录入口） */
+  function tryRestoreLocalSession(): AuthUser | null {
+    try {
+      const s = readSession()
+      if (s && s.expiresAt > Date.now()) {
+        const rec = readUsers().find((x) => x.username === s.username)
+        if (rec) {
+          writeSession({ username: rec.username, expiresAt: Date.now() + SESSION_MS })
+          return { username: rec.username, email: rec.email }
+        }
+      }
+    } catch { /* ignore */ }
+    return null
+  }
 
   useEffect(() => {
     let unsub: (() => void) | undefined
@@ -71,10 +106,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (cloudReady && supabase) {
         try {
           const cu = await getCloudUser()
-          if (cu) setUser(await fetchMeta(cu.id))
+          if (cu) {
+            const meta = await fetchMeta(cu.id)
+            if (meta) { setUser(meta); writeSession({ username: meta.username, expiresAt: Date.now() + SESSION_MS }) }
+            else setUser(tryRestoreLocalSession())
+          } else {
+            // 云端无会话：若云端不可达则用本地会话恢复；云端可达则视为已登出
+            setUser(isCloudOnline() ? null : tryRestoreLocalSession())
+          }
           const { data } = supabase.auth.onAuthStateChange(async (_e, session) => {
-            if (session?.user) setUser(await fetchMeta(session.user.id))
-            else setUser(null)
+            if (session?.user) {
+              const meta = await fetchMeta(session.user.id)
+              setUser(meta || tryRestoreLocalSession())
+            } else {
+              setUser(isCloudOnline() ? null : tryRestoreLocalSession())
+            }
           })
           unsub = data?.subscription.unsubscribe
         } finally {
@@ -82,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         return
       }
-      // —— 本地演示模式 ——
+      // —— 本地模式 ——
       try {
         let list = readUsers()
         if (!list.length) {
@@ -90,22 +136,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           list = [{ username: DEFAULT_USERNAME, hash }]
           writeUsers(list)
         }
-        const s = readSession()
-        if (s && s.expiresAt > Date.now()) {
-          const rec = list.find((x) => x.username === s.username)
-          if (rec) {
-            setUser({ username: rec.username, email: rec.email })
-            writeSession({ username: rec.username, expiresAt: Date.now() + SESSION_MS })
-          }
-        }
+        setUser(tryRestoreLocalSession())
       } finally {
         setReady(true)
       }
     })()
     return () => { unsub?.() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  function writeSession(s: Session) { try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)) } catch { /* ignore */ } }
 
   const lockMsg = (until: number) => {
     const mins = Math.max(1, Math.ceil((until - Date.now()) / 60000))
@@ -130,7 +168,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (cloudReady && supabase) {
       const { error } = await supabase.auth.signInWithPassword({ email: cloudEmailOf(name), password })
-      if (error) return onFail(cloudErrorHint(error.message))
+      if (error) {
+        // 网络不可达 → 自动降级本地验证，保证随时能登录
+        if (isNetworkError(error)) {
+          const localErr = await localLogin(name, password)
+          if (localErr) {
+            return localErr === '账号不存在，请先注册'
+              ? '云端暂时不可用，且本机没有这个账号。请先注册，或稍后网络恢复再试'
+              : localErr + '（云端不可用，已尝试本地验证）'
+          }
+          if (locks[key]) { delete locks[key]; writeLocks(locks) }
+          setUser({ username: name })
+          void probeCloud()
+          return null
+        }
+        return onFail(cloudErrorHint(error.message))
+      }
       const u = (await getCloudUser())
       if (u) setUser(await fetchMeta(u.id))
       if (locks[key]) { delete locks[key]; writeLocks(locks) }
@@ -156,12 +209,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (cloudReady && supabase) {
       const { data, error } = await supabase.auth.signUp({ email: cloudEmailOf(name), password, options: { data: { username: name } } })
-      if (error) return cloudErrorHint(error.message)
+      if (error) {
+        // 网络不可达 → 降级本地注册
+        if (isNetworkError(error)) {
+          const list = readUsers()
+          if (list.some((x) => x.username.toLowerCase() === name.toLowerCase())) return '这个账号已被占用'
+          const hash = await digest(password + salt(name))
+          writeUsers([...list, { username: name, email: email?.trim() || undefined, hash }])
+          writeSession({ username: name, expiresAt: Date.now() + SESSION_MS })
+          setUser({ username: name, email: email?.trim() || undefined })
+          void probeCloud()
+          return null
+        }
+        return cloudErrorHint(error.message)
+      }
       if (!data.session) return '注册成功，但需要先通过邮箱验证才能登录。请在 Supabase Auth 设置里关闭 Email confirmation，或直接联系我协助'
       const uid = data.user?.id
       if (uid) {
         try { await supabase.from('user_meta').insert({ user_id: uid, username: name, email: email?.trim() || undefined }) } catch { /* ignore */ }
         setUser({ username: name, email: email?.trim() || undefined })
+        writeSession({ username: name, expiresAt: Date.now() + SESSION_MS })
       }
       return null
     }
@@ -177,12 +244,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   function logout() {
-    if (cloudReady && supabase) { supabase.auth.signOut().catch(() => { /* ignore */ }); setUser(null); return }
     try { localStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
+    if (cloudReady && supabase) { supabase.auth.signOut().catch(() => { /* ignore */ }) }
     setUser(null)
   }
 
-  return <Ctx.Provider value={{ ready, cloud: cloudReady, user, login, register, logout }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ ready, cloud: cloudReady, cloudOnline, user, login, register, logout }}>{children}</Ctx.Provider>
 }
 
 export function useAuth(): AuthApi {

@@ -4,7 +4,7 @@ import { Button, Field, TextInput, cx } from '../components/ui'
 import { Coins, Eye, EyeOff, Lock, User as UserIcon, Mail, ShieldCheck } from 'lucide-react'
 
 export default function Login() {
-  const { login, register, ready, cloud } = useAuth()
+  const { login, register, ready, cloud, cloudOnline } = useAuth()
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [username, setUsername] = useState(DEFAULT_USERNAME)          // 登录自动带出账号
   const [password, setPassword] = useState(DEFAULT_USERNAME)          // 自动带出前缀，只需补 84265
@@ -102,7 +102,7 @@ export default function Login() {
 
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-start gap-1.5 text-[10px] text-slate-400 leading-4">
             <ShieldCheck size={13} className="shrink-0 mt-0.5 text-emerald-500" />
-            <span>{cloud ? '✓ 已连接云端：多设备实时同步已开启，数据自动加密备份' : '当前为本地演示登录（账号保存在本机浏览器）'}</span>
+            <span>{cloud ? (cloudOnline ? '✓ 已连接云端：多设备实时同步已开启，数据自动加密备份' : '⚠ 云端暂不可用：将使用本机账号验证登录，数据暂不同步，网络恢复后自动合并') : '当前为本地演示登录（账号保存在本机浏览器）'}</span>
           </div>
         </div>
 
