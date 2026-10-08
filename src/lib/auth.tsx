@@ -108,7 +108,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const cu = await getCloudUser()
           if (cu) {
             const meta = await fetchMeta(cu.id)
-            if (meta) { setUser(meta); writeSession({ username: meta.username, expiresAt: Date.now() + SESSION_MS }) }
+            if (meta) {
+              setUser(meta); writeSession({ username: meta.username, expiresAt: Date.now() + SESSION_MS })
+              // 云端会话恢复 → 同步本地用户表（无密码哈希占位），供云端不可达时会话恢复匹配
+              const list = readUsers()
+              if (!list.some((x) => x.username.toLowerCase() === meta.username.toLowerCase())) {
+                writeUsers([...list, { username: meta.username, email: meta.email, hash: '' }])
+              }
+            }
             else setUser(tryRestoreLocalSession())
           } else {
             // 云端无会话：若云端不可达则用本地会话恢复；云端可达则视为已登出
@@ -185,7 +192,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return onFail(cloudErrorHint(error.message))
       }
       const u = (await getCloudUser())
-      if (u) setUser(await fetchMeta(u.id))
+      if (u) {
+        const meta = await fetchMeta(u.id)
+        setUser(meta || { username: name })
+        // 云端登录成功 → 同步写入本地用户表（含密码哈希）+ 本地会话，供云端不可达时降级
+        const list = readUsers()
+        if (!list.some((x) => x.username.toLowerCase() === key)) {
+          const hash = await digest(password + salt(name))
+          writeUsers([...list, { username: name, email: meta?.email, hash }])
+        }
+        writeSession({ username: name, expiresAt: Date.now() + SESSION_MS })
+      }
       if (locks[key]) { delete locks[key]; writeLocks(locks) }
       return null
     }
@@ -228,6 +245,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (uid) {
         try { await supabase.from('user_meta').insert({ user_id: uid, username: name, email: email?.trim() || undefined }) } catch { /* ignore */ }
         setUser({ username: name, email: email?.trim() || undefined })
+        // 同步写入本地用户表 + 会话，供云端不可达时降级
+        const list = readUsers()
+        if (!list.some((x) => x.username.toLowerCase() === name.toLowerCase())) {
+          const hash = await digest(password + salt(name))
+          writeUsers([...list, { username: name, email: email?.trim() || undefined, hash }])
+        }
         writeSession({ username: name, expiresAt: Date.now() + SESSION_MS })
       }
       return null
